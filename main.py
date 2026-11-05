@@ -20,23 +20,55 @@ from sheets_client import SheetsQuotaExceededError
 from mock_sheet import MockSheetClient
 from summary import compute_summary, previous_month_abbr
 
-# Check if real credentials exist or if user requested mock mode
 USE_MOCK = os.getenv("USE_MOCK", "false").lower() in ("true", "1", "yes")
 
-# Auto-fallback to mock if required keys are missing
-has_gemini = bool(os.getenv("GEMINI_API_KEY"))
-has_sheets = bool(os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON_PATH")) and bool(os.getenv("GOOGLE_SHEET_ID"))
+_parser = None
+_sheet = None
+_sheet_err = None
 
-if USE_MOCK or not (has_gemini and has_sheets):
-    if not USE_MOCK:
-        print("[Notice] Running in MOCK mode (real GEMINI_API_KEY or Google Sheet credentials not fully set).")
-    parser = MockParser()
-    sheet = MockSheetClient()
-else:
-    from parser import GeminiParser
-    from sheets_client import SheetsClient
-    parser = GeminiParser()
-    sheet = SheetsClient()
+def get_parser():
+    global _parser
+    if _parser is not None:
+        return _parser
+    if USE_MOCK:
+        _parser = MockParser()
+        return _parser
+    if os.getenv("GEMINI_API_KEY"):
+        try:
+            from parser import GeminiParser
+            _parser = GeminiParser()
+            print("[Init] GeminiParser initialized successfully.")
+            return _parser
+        except Exception as e:
+            print(f"[Init Warning] Failed to initialize GeminiParser: {e}. Falling back to MockParser.")
+            _parser = MockParser()
+            return _parser
+    else:
+        print("[Init] GEMINI_API_KEY not set. Using MockParser.")
+        _parser = MockParser()
+        return _parser
+
+def get_sheet():
+    global _sheet, _sheet_err
+    if _sheet is not None:
+        return _sheet, None
+    if USE_MOCK:
+        _sheet = MockSheetClient()
+        return _sheet, None
+    try:
+        from sheets_client import SheetsClient
+        _sheet = SheetsClient()
+        _sheet_err = None
+        print("[Init] SheetsClient connected to Google Sheets successfully.")
+        return _sheet, None
+    except Exception as e:
+        _sheet_err = str(e)
+        print(f"[Init Error] Failed to connect to Google Sheets: {e}")
+        return None, _sheet_err
+
+# Initialize on module load
+parser = get_parser()
+sheet, _init_err = get_sheet()
 
 def current_month_abbr() -> str:
     return MONTH_NAMES[datetime.now().month - 1]
@@ -50,8 +82,9 @@ def handle_message(message: str, person: str) -> str:
     if lowered in ("summary", "how much did we spend", "monthly summary", "how much this month", "expense summary"):
         return handle_summary_request()
 
+    active_parser = get_parser()
     try:
-        entries = parser.parse(text)
+        entries = active_parser.parse(text)
     except QuotaExceededError:
         return QUOTA_RESET_MESSAGE_IST
     except ModelUnavailableError as e:
@@ -64,13 +97,17 @@ def handle_message(message: str, person: str) -> str:
     if not entries:
         return "Couldn't find an expense amount in that. Please include a number, e.g. '250 auto' or 'eggs 60'."
 
+    active_sheet, sheet_err = get_sheet()
+    if active_sheet is None:
+        return f"❌ Google Sheet write failed: Could not connect to Sheet ({sheet_err})."
+
     month_abbr = current_month_abbr()
     today_str = datetime.now().strftime("%d-%b-%Y")
     logged = []
 
     for e in entries:
         try:
-            row_num = sheet.append_row(
+            row_num = active_sheet.append_row(
                 month_abbr=month_abbr,
                 date=today_str,
                 description=e["description"],
@@ -95,9 +132,12 @@ def handle_message(message: str, person: str) -> str:
 def handle_summary_request() -> str:
     month_abbr = current_month_abbr()
     month_label = MONTH_FULL_NAMES[month_abbr]
+    active_sheet, sheet_err = get_sheet()
+    if active_sheet is None:
+        return f"❌ Google Sheet error: Could not connect to Sheet ({sheet_err})."
     try:
-        rows = sheet.get_month_rows(month_abbr)
-        prev_rows = sheet.get_month_rows(previous_month_abbr(month_abbr))
+        rows = active_sheet.get_month_rows(month_abbr)
+        prev_rows = active_sheet.get_month_rows(previous_month_abbr(month_abbr))
     except SheetsQuotaExceededError:
         return "Google Sheets is briefly rate-limited — please try again in a minute."
     except Exception as e:
