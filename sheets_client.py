@@ -34,7 +34,14 @@ class SheetsClient:
         elif key_path and os.path.exists(key_path):
             creds = Credentials.from_service_account_file(key_path, scopes=SCOPES)
         else:
-            raise FileNotFoundError(f"Google service account key not found at: {key_path} and GOOGLE_SERVICE_ACCOUNT_JSON is not set.")
+            try:
+                import google.auth
+                creds, _ = google.auth.default(scopes=SCOPES)
+            except Exception as e:
+                raise FileNotFoundError(
+                    f"Google service account key not found at {key_path}, "
+                    f"GOOGLE_SERVICE_ACCOUNT_JSON is not set, and ADC fallback failed: {e}"
+                )
 
         gc = self.gspread.authorize(creds)
         self.spreadsheet = gc.open_by_key(sheet_id)
