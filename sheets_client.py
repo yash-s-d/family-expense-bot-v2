@@ -20,16 +20,23 @@ class SheetsClient:
         except ImportError as e:
             raise ImportError("Please install gspread and google-auth: pip install gspread google-auth") from e
 
-        self.gspread = gspread
         key_path = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON_PATH")
+        json_raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
         sheet_id = os.getenv("GOOGLE_SHEET_ID")
-        if not key_path or not os.path.exists(key_path):
-            raise FileNotFoundError(f"Google service account key not found at: {key_path}")
+
         if not sheet_id:
             raise ValueError("GOOGLE_SHEET_ID environment variable is not set.")
 
-        creds = Credentials.from_service_account_file(key_path, scopes=SCOPES)
-        gc = gspread.authorize(creds)
+        if json_raw:
+            import json
+            info = json.loads(json_raw)
+            creds = Credentials.from_service_account_info(info, scopes=SCOPES)
+        elif key_path and os.path.exists(key_path):
+            creds = Credentials.from_service_account_file(key_path, scopes=SCOPES)
+        else:
+            raise FileNotFoundError(f"Google service account key not found at: {key_path} and GOOGLE_SERVICE_ACCOUNT_JSON is not set.")
+
+        gc = self.gspread.authorize(creds)
         self.spreadsheet = gc.open_by_key(sheet_id)
 
     def _get_worksheet(self, month_abbr: str):
