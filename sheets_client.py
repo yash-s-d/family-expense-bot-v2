@@ -20,6 +20,7 @@ class SheetsClient:
         except ImportError as e:
             raise ImportError("Please install gspread and google-auth: pip install gspread google-auth") from e
 
+        self.gspread = gspread
         key_path = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON_PATH")
         json_raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
         sheet_id = os.getenv("GOOGLE_SHEET_ID")
