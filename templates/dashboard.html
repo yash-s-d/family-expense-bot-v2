@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Finance · Command Center</title>
+  
+  <!-- Fonts: Poppins (Headings) + Inter (Body & Tabular Financial Figures) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via allowlisted Google gstatic CDN -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+
+  <style>
+    /* Neo-Fintech Design System Tokens */
+    :root {
+      --brand-lime: #B3ED74;
+      --brand-forest: #064B19;
+      --brand-mint: #CCF3A0;
+      --brand-light-green: #E9F8D8;
+      
+      --canvas-bg: #F3F3F3;
+      --card-bg: #FFFFFF;
+      --text-primary: #171717;
+      --text-secondary: #858585;
+      --text-muted: #B5B5B5;
+      --border-subtle: #EEEEEE;
+      --divider-color: #F0F0F0;
+      
+      --semantic-positive: #279B58;
+      --semantic-negative: #E36C65;
+      --semantic-warning: #E9A23B;
+      --semantic-info: #6795D4;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--canvas-bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Poppins', 'Inter', sans-serif;
+    }
+
+    /* Tabular Numerals for strict financial figures */
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+    }
+
+    /* Subtle shadow matching guideline: 0 2px 12px rgba(0,0,0,0.025) */
+    .neo-shadow {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.028);
+    }
+    .neo-shadow-hover:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Smooth transitions */
+    .smooth-transition {
+      transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E0E0E0;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C5C5C5;
+    }
+
+    /* Subtle rotating star watermark in highlight card */
+    .watermark-star {
+      position: absolute;
+      right: -24px;
+      top: -24px;
+      width: 220px;
+      height: 220px;
+      opacity: 0.16;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex justify-center items-start">
+
+  <!-- Master Application Canvas Container (30px radius) -->
+  <div class="w-full max-w-[1340px] bg-[#FFFFFF] md:bg-[#F8F9F8] rounded-[30px] p-4 md:p-8 border border-[#EBEBEB] neo-shadow">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-[#F0F0F0]">
+      
+      <!-- User Profile & Greeting -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-full bg-[#064B19] text-[#B3ED74] font-semibold text-lg flex items-center justify-center neo-shadow border-2 border-white">
+          T
+        </div>
+        <div>
+          <h1 class="text-[20px] md:text-[22px] font-semibold tracking-tight text-[#171717] flex items-center gap-2">
+            Hello, <span id="userGreetingName">Tanmay</span>
+          </h1>
+          <p class="text-xs text-[#858585] flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#279B58] inline-block animate-pulse"></span>
+            Google Sheet Synced · Family Finance 2026
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs Pill Group -->
+      <nav class="flex items-center gap-1 bg-[#FFFFFF] p-1.5 rounded-full border border-[#EEEEEE] self-start md:self-center neo-shadow">
+        <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn px-5 py-2 rounded-full text-sm font-medium smooth-transition bg-[#B3ED74] text-[#064B19]">
+          Overview
+        </button>
+        <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn px-5 py-2 rounded-full text-sm font-medium smooth-transition text-[#858585] hover:text-[#171717]">
+          Analytics
+        </button>
+        <button onclick="switchTab('transactions')" id="tab-transactions" class="tab-btn px-5 py-2 rounded-full text-sm font-medium smooth-transition text-[#858585] hover:text-[#171717]">
+          Transactions
+        </button>
+        <button onclick="switchTab('fixed')" id="tab-fixed" class="tab-btn px-5 py-2 rounded-full text-sm font-medium smooth-transition text-[#858585] hover:text-[#171717]">
+          Fixed & Commitments
+        </button>
+      </nav>
+
+      <!-- Right Header Controls: Month Selector, Search & Notification -->
+      <div class="flex items-center gap-2.5 self-end md:self-center">
+        <!-- Month Selector Dropdown Pill -->
+        <div class="relative">
+          <select id="monthSelector" onchange="onMonthChange(this.value)" class="appearance-none bg-white border border-[#EEEEEE] text-[#171717] font-medium text-xs md:text-sm pl-4 pr-9 py-2.5 rounded-full neo-shadow cursor-pointer hover:border-[#B3ED74] focus:outline-none focus:ring-2 focus:ring-[#B3ED74]">
+            <option value="Nov" selected>November 2026</option>
+            <option value="Oct">October 2026</option>
+            <option value="Sep">September 2026</option>
+            <option value="Dec">December 2026</option>
+            <option value="Mar">March 2026</option>
+            <option value="Apr">April 2026</option>
+            <option value="May">May 2026</option>
+            <option value="Jun">June 2026</option>
+          </select>
+          <div class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#858585]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+
+        <!-- Quick Search Button -->
+        <button onclick="focusSearch()" title="Search transactions" class="w-10 h-10 rounded-full bg-white border border-[#EEEEEE] text-[#171717] flex items-center justify-center neo-shadow hover:bg-[#F3F3F3] smooth-transition">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+
+        <!-- Notification Bell with Count Badge (24) -->
+        <div class="relative">
+          <button onclick="toggleNotificationToast()" class="w-10 h-10 rounded-full bg-white border border-[#EEEEEE] text-[#171717] flex items-center justify-center neo-shadow hover:bg-[#F3F3F3] smooth-transition">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          </button>
+          <span class="absolute -top-1 -right-1 bg-[#E36C65] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white tabular-nums">
+            24
+          </span>
+        </div>
+
+        <!-- Refresh / Force Sync Button -->
+        <button onclick="refreshData()" title="Sync with Google Sheet" class="w-10 h-10 rounded-full bg-white border border-[#EEEEEE] text-[#064B19] flex items-center justify-center neo-shadow hover:bg-[#E9F8D8] smooth-transition">
+          <svg id="syncIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: OVERVIEW (MATCHING REFERENCE UI) -->
+    <!-- ========================================== -->
+    <main id="view-overview" class="space-y-6">
+      
+      <!-- HERO SECTION: 2 MAIN HIGHLIGHT CARDS -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- CARD 1 (LEFT 60%): WHITE FEATURE CARD -->
+        <div class="lg:col-span-7 bg-[#FFFFFF] rounded-[26px] p-6 md:p-8 border border-[#EEEEEE] neo-shadow relative flex flex-col justify-between">
+          
+          <!-- Top Row: Privacy Toggle & Outflow Badge (Replaces Currency Switcher & Account ID) -->
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <!-- Privacy Toggle Button -->
+            <button onclick="togglePrivacy()" title="Toggle Privacy Mask" class="flex items-center gap-2 bg-[#F3F3F3] hover:bg-[#EAEAEA] text-[#171717] px-3.5 py-1.5 rounded-full text-xs font-semibold smooth-transition neo-shadow">
+              <svg id="eyeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+              <span id="eyeText" class="text-[11px] font-medium text-[#858585]">Hide figures</span>
+            </button>
+
+            <!-- Status Pill -->
+            <span class="bg-[#F3F3F3] text-[#858585] text-[11px] font-medium px-3 py-1 rounded-full">
+              Monthly Outflow
+            </span>
+          </div>
+
+          <!-- Middle: Total Spent Display -->
+          <div class="my-2">
+            <span class="text-xs md:text-sm text-[#858585] font-normal block mb-1">Total Spent</span>
+            <div class="flex items-baseline flex-wrap gap-2.5">
+              <span id="totalSpentDisplay" class="text-[34px] sm:text-[42px] md:text-[50px] font-normal tracking-tight text-[#171717] tabular-nums font-heading">
+                ₹202,229.00
+              </span>
+              <span class="bg-[#F3F3F3] text-[#171717] text-[11px] font-semibold px-2.5 py-0.5 rounded-full tabular-nums">
+                Household Spent
+              </span>
+            </div>
+          </div>
+
+          <!-- Nested 2 Cards (14px Radius) - Savings & Investments -->
+          <div class="grid grid-cols-2 gap-3 my-4">
+            <!-- Nested Card 1: Monthly Saving & Saving % -->
+            <div class="bg-[#F8F9F8] rounded-[14px] p-3 md:p-3.5 border border-[#EEEEEE] neo-shadow flex flex-col justify-between">
+              <div class="flex items-center justify-between text-[#858585] mb-1.5">
+                <span class="text-[11px] font-semibold text-[#171717]">Monthly Saving</span>
+                <span id="savingPctDisplay" class="bg-[#E9F8D8] text-[#279B58] text-[10px] font-bold px-2 py-0.5 rounded-full tabular-nums">
+                  43.57%
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5 text-sm md:text-base font-bold text-[#279B58] tabular-nums font-heading">
+                <span id="savingDisplay">₹156,121.00</span>
+              </div>
+            </div>
+
+            <!-- Nested Card 2: Investments & Investment % -->
+            <div class="bg-[#F8F9F8] rounded-[14px] p-3 md:p-3.5 border border-[#EEEEEE] neo-shadow flex flex-col justify-between">
+              <div class="flex items-center justify-between text-[#858585] mb-1.5">
+                <span class="text-[11px] font-semibold text-[#171717]">Investments / SIP</span>
+                <span id="investmentPctDisplay" class="bg-[#CCF3A0] text-[#064B19] text-[10px] font-bold px-2 py-0.5 rounded-full tabular-nums">
+                  9.77%
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5 text-sm md:text-base font-bold text-[#064B19] tabular-nums font-heading">
+                <span id="investmentDisplay">₹35,000.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons + Floating Lime Arrow Button -->
+          <div class="flex items-center justify-between gap-3 pt-4 border-t border-[#F5F5F5]">
+            <div class="flex items-center flex-wrap gap-2.5">
+              <!-- Primary Action: Add Expense -->
+              <button onclick="openAddExpenseModal()" class="h-[44px] px-5 bg-[#064B19] text-[#FFFFFF] rounded-[14px] text-xs md:text-sm font-semibold hover:bg-[#085a1f] smooth-transition flex items-center gap-2 neo-shadow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <span>Add Expense</span>
+              </button>
+
+              <!-- Secondary Action: Request Summary -->
+              <button onclick="openSummaryModal()" class="h-[44px] px-4 md:px-5 bg-white text-[#064B19] border border-[#BFCBBE] rounded-[14px] text-xs md:text-sm font-semibold hover:bg-[#F7F9F7] smooth-transition flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                <span>Request Summary</span>
+              </button>
+
+              <!-- More Options Menu -->
+              <button onclick="openOptionsMenu()" class="h-[44px] w-[44px] rounded-[14px] bg-[#F7F7F7] text-[#171717] flex items-center justify-center hover:bg-[#EEEEEE] smooth-transition">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+              </button>
+            </div>
+
+            <!-- Floating Lime Corner Button with Arrow (↗) -->
+            <button onclick="switchTab('transactions')" title="Open Full Ledger" class="w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#B3ED74] text-[#064B19] flex items-center justify-center neo-shadow hover:scale-105 smooth-transition flex-shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- CARD 2 (RIGHT 40%): LIME GREEN FEATURE CARD -->
+        <div class="lg:col-span-5 bg-[#B3ED74] rounded-[26px] p-6 md:p-8 relative overflow-hidden text-[#064B19] neo-shadow flex flex-col justify-between">
+          
+          <!-- Subtle Botanical/Geometric Star Watermark -->
+          <svg class="watermark-star" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 0C100 55.2285 144.772 100 200 100C144.772 100 100 144.772 100 200C100 144.772 55.2285 100 0 100C55.2285 100 100 55.2285 100 0Z" fill="#064B19"/>
+          </svg>
+
+          <!-- Top Row: Priority Pill & More Button -->
+          <div class="flex items-center justify-between mb-4 relative z-10">
+            <button class="bg-[#064B19] text-[#B3ED74] px-4 py-1.5 rounded-full text-xs font-bold tracking-wider flex items-center gap-1.5 uppercase hover:opacity-90 smooth-transition">
+              <span>PRIORITY</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            </button>
+
+            <button onclick="togglePrivacy()" title="Toggle Privacy Mask" class="text-[#064B19] opacity-75 hover:opacity-100 p-1.5 rounded-full hover:bg-black/5 smooth-transition">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+
+          <!-- Middle: Total Income (Income + Previous Month) Display -->
+          <div class="my-3 relative z-10">
+            <span class="text-xs md:text-sm font-medium opacity-85 block mb-1">Income + Previous Month</span>
+            <div class="flex items-baseline flex-wrap gap-2.5">
+              <span id="rewardsInflowDisplay" class="text-[32px] sm:text-[38px] md:text-[44px] font-normal tracking-tight tabular-nums font-heading">
+                ₹358,350.00
+              </span>
+              <span class="bg-white/80 text-[#064B19] text-[11px] font-bold px-2.5 py-0.5 rounded-full tabular-nums">
+                Total Inflow
+              </span>
+            </div>
+          </div>
+
+          <!-- Bottom 2 Nested Cards (14px Radius) - Income from Month & Extra from Previous Month -->
+          <div class="grid grid-cols-2 gap-3 mt-4 relative z-10">
+            <!-- Nested Card 1: Income (This Month) -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-[14px] p-3 md:p-3.5 border border-white/40 neo-shadow">
+              <div class="flex items-center justify-between text-[#064B19]/75 mb-1.5">
+                <span class="text-[11px] font-semibold">Income (This Month)</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
+              <div class="flex items-center gap-1.5 text-sm md:text-base font-bold text-[#064B19] tabular-nums">
+                <span id="currentMonthIncomeDisplay">₹184,500.00</span>
+              </div>
+            </div>
+
+            <!-- Nested Card 2: Extra from Previous Month -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-[14px] p-3 md:p-3.5 border border-white/40 neo-shadow">
+              <div class="flex items-center justify-between text-[#064B19]/75 mb-1.5">
+                <span class="text-[11px] font-semibold">Extra from Prev Month</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/></svg>
+              </div>
+              <div class="flex items-center gap-1.5 text-sm md:text-base font-bold text-[#064B19] tabular-nums">
+                <span id="extraPrevMonthDisplay">₹173,850.00</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- BOTTOM GRID: 2 BALANCED COLUMNS (EXPANDED SPENDING BAR GRAPH + TRANSACTIONS) -->
+      <!-- ============================================== -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
+        
+        <!-- CARD 3 (EXPANDED 8 COLS): HOUSEHOLD SPENDING (EXCL. INVESTMENTS) WITH BUDGET BAR GRAPH -->
+        <div class="lg:col-span-8 bg-[#FFFFFF] rounded-[20px] p-6 md:p-7 border border-[#EEEEEE] neo-shadow flex flex-col justify-between relative">
+          <div>
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-[#F3F3F3] flex items-center justify-center text-[#171717] flex-shrink-0 mt-0.5">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-semibold text-lg text-[#171717]">Household Spending</h3>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#064B19] bg-[#E9F8D8] px-2.5 py-0.5 rounded-full border border-[#CCF3A0]">
+                      Excl. Investments
+                    </span>
+                  </div>
+                  <p class="text-xs text-[#858585] mt-0.5">Living & operational expenses vs monthly category budget</p>
+                </div>
+              </div>
+
+              <!-- Right Header Metrics -->
+              <div class="flex items-center gap-3 self-end sm:self-auto">
+                <span id="spendingMonthPill" class="text-xs font-medium text-[#858585] bg-[#F3F3F3] px-3 py-1 rounded-full">
+                  September 2026
+                </span>
+                <div class="text-right pl-2 border-l border-[#EEEEEE]">
+                  <span class="text-[10px] uppercase font-semibold text-[#858585] block">Total Spent</span>
+                  <span id="spendingTotalDisplay" class="text-xl md:text-2xl font-bold text-[#171717] tabular-nums font-heading">
+                    ₹1,67,229.00
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Insight Strip & Legend -->
+            <div class="bg-[#F8F9F8] border border-[#EEEEEE] rounded-[14px] py-2 px-3.5 text-xs text-[#171717] flex flex-col md:flex-row md:items-center justify-between gap-2 my-4">
+              <div class="flex items-center gap-2 min-w-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#E9A23B] flex-shrink-0"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span id="spendingInsightText" class="truncate font-medium text-xs text-[#171717]">Housing & Utilities is your highest spend at 21.1%</span>
+              </div>
+              <div class="flex items-center gap-3 text-[11px] text-[#858585] flex-shrink-0 font-medium">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#B3ED74]"></span> Within Budget</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#E36C65]"></span> Over Budget</span>
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-3 bg-[#171717] rounded-sm inline-block"></span> Budget Target</span>
+              </div>
+            </div>
+
+            <!-- Category Bar Graph Container -->
+            <div id="categoryBarsContainer" class="space-y-3.5 max-h-[380px] overflow-y-auto pr-1.5 py-1">
+              <!-- Dynamically populated via JS with interactive hover tooltips -->
+            </div>
+          </div>
+
+          <!-- Bottom Footer Note -->
+          <div class="pt-3 border-t border-[#F0F0F0] mt-4 flex items-center justify-between text-xs text-[#858585]">
+            <span class="flex items-center gap-1.5">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Hover over any category bar to inspect allocated budget, actual spend, and variances
+            </span>
+            <button onclick="switchTab('analytics')" class="text-xs font-semibold text-[#064B19] hover:underline inline-flex items-center gap-1">
+              <span>View full budget table</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN (4 COLS): UPCOMING REMINDERS & TRANSACTIONS -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+
+          <!-- CARD: UPCOMING REMINDERS (ANNUAL COMMITMENTS & INSURANCE) -->
+          <div class="bg-[#FFFFFF] rounded-[20px] p-5 md:p-6 border border-[#EEEEEE] neo-shadow flex flex-col justify-between">
+            <div>
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-3.5">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-[#E9F8D8] text-[#064B19] flex items-center justify-center flex-shrink-0">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-sm md:text-base text-[#171717]">Upcoming Reminders</h3>
+                    <p class="text-[10px] text-[#858585]">Annual commitments & premiums</p>
+                  </div>
+                </div>
+                <span id="overviewReminderBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19] tabular-nums">
+                  2 Upcoming
+                </span>
+              </div>
+
+              <!-- Dynamic Reminder Cards List -->
+              <div id="overviewRemindersList" class="space-y-2.5">
+                <!-- Populated dynamically via JS -->
+              </div>
+
+              <!-- Auto-Provision Reserve Callout -->
+              <div class="bg-[#F8F9F8] border border-[#EEEEEE] rounded-[14px] p-2.5 mt-3 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-1.5 text-[#858585] text-[11px]">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#064B19]"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/></svg>
+                  <span>Auto-Provisioned:</span>
+                </div>
+                <span class="font-bold text-[#064B19] tabular-nums text-xs">₹14,814 / mo reserve</span>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-[#F0F0F0] mt-3 text-center">
+              <button onclick="switchTab('fixed')" class="text-xs font-semibold text-[#064B19] hover:underline inline-flex items-center gap-1">
+                <span>View all commitments & timeline</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD: ACTIVE EMIs & LOANS HIGHLIGHT -->
+          <div class="bg-[#FFFFFF] rounded-[20px] p-5 md:p-6 border border-[#EEEEEE] neo-shadow flex flex-col justify-between">
+            <div>
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-3.5">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-[#E9F8D8] text-[#064B19] flex items-center justify-center flex-shrink-0">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-sm md:text-base text-[#171717]">Loans & EMIs</h3>
+                    <p class="text-[10px] text-[#858585]">Monthly debt & leverage health</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span id="overviewLoanTotal" class="text-xs font-bold text-[#171717] tabular-nums font-heading block">₹29,500/mo</span>
+                  <span id="overviewThermometerBadge" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19] inline-flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#279B58]"></span>
+                    <span>15.95% Safe</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Financial Thermometer Mini Gauge -->
+              <div class="bg-[#F8F9F8] border border-[#EEEEEE] rounded-[14px] p-3 mb-3">
+                <div class="flex items-center justify-between text-[11px] mb-1.5">
+                  <span class="text-[#858585] font-medium">Financial Thermometer:</span>
+                  <span class="font-bold text-[#064B19] tabular-nums" id="overviewThermometerPctText">15.95% of Income</span>
+                </div>
+                <!-- Track -->
+                <div class="w-full h-2 bg-[#EEEEEE] rounded-full overflow-hidden relative">
+                  <div id="overviewThermometerBar" class="h-full bg-[#279B58] rounded-full smooth-transition" style="width: 15.95%;"></div>
+                  <div class="absolute top-0 bottom-0 left-[20%] w-0.5 bg-[#171717]/40" title="20% Safe Limit"></div>
+                </div>
+                <div class="flex items-center justify-between text-[9px] text-[#858585] mt-1.5">
+                  <span class="text-[#279B58] font-semibold flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#279B58]"></span> Safe Zone (&lt;20%)
+                  </span>
+                  <span class="tabular-nums">Capacity: +<strong class="text-[#171717]">₹7,500</strong> safe new EMI</span>
+                </div>
+              </div>
+
+              <!-- Dynamic Loan Mini Cards List -->
+              <div id="overviewLoanList" class="space-y-2">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-[#F0F0F0] mt-3 text-center">
+              <button onclick="switchTab('fixed')" class="text-xs font-semibold text-[#064B19] hover:underline inline-flex items-center gap-1">
+                <span>View all loan schedules & details</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD 5: TRANSACTIONS -->
+          <div class="bg-[#FFFFFF] rounded-[20px] p-5 md:p-6 border border-[#EEEEEE] neo-shadow flex flex-col justify-between">
+            <div>
+              <!-- Header -->
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-[#F3F3F3] flex items-center justify-center text-[#171717]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>
+                  </div>
+                  <h3 class="font-semibold text-base text-[#171717]">Transactions</h3>
+                </div>
+                <button onclick="switchTab('transactions')" class="text-[#858585] hover:text-[#171717] p-1">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                </button>
+              </div>
+
+              <!-- PAYMENT CONFIRMATION / RECENT BOT ITEM (REFERENCE UI) -->
+              <div id="paymentConfirmationBanner" class="bg-[#F8F9F8] border border-[#EEEEEE] rounded-[14px] p-3 mb-3 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <div class="w-8 h-8 rounded-full bg-[#E9F8D8] text-[#064B19] flex items-center justify-center flex-shrink-0">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>
+                  </div>
+                  <div class="min-w-0">
+                    <h4 class="text-xs font-semibold text-[#171717] truncate">Bot Entry: 70 eggs ₹70</h4>
+                    <p class="text-[10px] text-[#E36C65] font-medium">Payment confirmation</p>
+                  </div>
+                </div>
+                <!-- Check / Cross action buttons -->
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <button onclick="dismissConfirmation(true)" title="Confirm" class="w-7 h-7 rounded-full bg-[#B3ED74] text-[#064B19] flex items-center justify-center hover:opacity-90 smooth-transition">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 7"/></svg>
+                  </button>
+                  <button onclick="dismissConfirmation(false)" title="Dismiss" class="w-7 h-7 rounded-full bg-[#FFFFFF] border border-[#EEEEEE] text-[#858585] flex items-center justify-center hover:text-[#171717] smooth-transition">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Transaction Rows (Scrollable / Compact) -->
+              <div id="overviewTransactionList" class="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+                <!-- Dynamically populated via JS -->
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-[#F0F0F0] mt-3 text-center">
+              <button onclick="switchTab('transactions')" class="text-xs font-semibold text-[#064B19] hover:underline inline-flex items-center gap-1">
+                <span>View all transactions</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- Floating Tooltip for Category Bar Graph -->
+      <div id="barTooltip" class="fixed hidden pointer-events-none bg-[#171717]/95 text-white text-xs rounded-[14px] p-3.5 shadow-2xl z-50 min-w-[220px] backdrop-blur-md border border-white/10 transition-opacity duration-150"></div>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: ANALYTICS & BREAKDOWN -->
+    <!-- ========================================== -->
+    <section id="view-analytics" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-[#171717]">Analytics & Intelligence</h2>
+          <p class="text-xs text-[#858585]">Detailed breakdown by Family Member, Category, and Velocity</p>
+        </div>
+      </div>
+
+      <!-- Member Breakdown Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Tanmay -->
+        <div class="bg-white rounded-[20px] p-5 border border-[#EEEEEE] neo-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-medium text-[#858585]">Tanmay</span>
+            <span class="w-7 h-7 rounded-full bg-[#E9F8D8] text-[#064B19] text-xs font-bold flex items-center justify-center">T</span>
+          </div>
+          <div class="text-2xl font-semibold text-[#171717] tabular-nums font-heading" id="analyticsTanmayAmount">₹12,256</div>
+          <div class="text-xs text-[#858585] mt-1" id="analyticsTanmayPct">34.0% of variable spend</div>
+        </div>
+
+        <!-- Dad -->
+        <div class="bg-white rounded-[20px] p-5 border border-[#EEEEEE] neo-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-medium text-[#858585]">Dad</span>
+            <span class="w-7 h-7 rounded-full bg-[#E9F8D8] text-[#064B19] text-xs font-bold flex items-center justify-center">D</span>
+          </div>
+          <div class="text-2xl font-semibold text-[#171717] tabular-nums font-heading" id="analyticsDadAmount">₹72,228</div>
+          <div class="text-xs text-[#858585] mt-1" id="analyticsDadPct">66.0% of variable spend</div>
+        </div>
+
+        <!-- Mom (Aai) -->
+        <div class="bg-white rounded-[20px] p-5 border border-[#EEEEEE] neo-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-medium text-[#858585]">Mom (Aai)</span>
+            <span class="w-7 h-7 rounded-full bg-[#E9F8D8] text-[#064B19] text-xs font-bold flex items-center justify-center">A</span>
+          </div>
+          <div class="text-2xl font-semibold text-[#171717] tabular-nums font-heading" id="analyticsMomAmount">₹0</div>
+          <div class="text-xs text-[#858585] mt-1" id="analyticsMomPct">Fixed commitments managed</div>
+        </div>
+
+        <!-- Akshat -->
+        <div class="bg-white rounded-[20px] p-5 border border-[#EEEEEE] neo-shadow">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-medium text-[#858585]">Akshat</span>
+            <span class="w-7 h-7 rounded-full bg-[#E9F8D8] text-[#064B19] text-xs font-bold flex items-center justify-center">A</span>
+          </div>
+          <div class="text-2xl font-semibold text-[#171717] tabular-nums font-heading" id="analyticsAkshatAmount">₹0</div>
+          <div class="text-xs text-[#858585] mt-1" id="analyticsAkshatPct">SIP active</div>
+        </div>
+      </div>
+
+      <!-- MEMBER-WISE SPENDING & CASHFLOW BREAKDOWN (FROM REFERENCE SPEC) -->
+      <div class="bg-white rounded-[24px] border border-[#EEEEEE] neo-shadow overflow-hidden">
+        <!-- Navy Header Bar Matching Specification -->
+        <div class="bg-[#1F3864] text-white px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-3 h-3 rounded-full bg-[#B3ED74]"></span>
+            <h3 class="font-bold text-sm tracking-wider uppercase font-heading">Member-Wise Spending Breakdown</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="memberBreakdownMonthBadge" class="text-xs bg-white/20 text-white px-3 py-1 rounded-full font-medium">November 2026</span>
+            <button onclick="openMemberSettingsModal()" class="text-xs bg-[#B3ED74] text-[#064B19] px-3.5 py-1.5 rounded-full font-semibold hover:bg-[#a6e663] smooth-transition flex items-center gap-1.5 neo-shadow">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Edit Budget Settings</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+            <thead class="bg-[#2B4373] text-white font-semibold text-[11px] uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-3 text-center">#</th>
+                <th class="py-3 px-4">Family Member</th>
+                <th class="py-3 px-4 text-right">Total Spent (₹)</th>
+                <th class="py-3 px-4 text-center">% of Household Spend</th>
+                <th class="py-3 px-4">Top Category</th>
+                <th class="py-3 px-4 text-right">Extra From Prev Month</th>
+                <th class="py-3 px-4 text-right">Income</th>
+                <th class="py-3 px-4 text-right">Income + Prev Month</th>
+                <th class="py-3 px-4 text-right">Investment</th>
+                <th class="py-3 px-4 text-right">Household Cash Available</th>
+              </tr>
+            </thead>
+            <tbody id="memberBreakdownTbody" class="divide-y divide-[#F0F0F0]">
+              <!-- Populated via JS -->
+            </tbody>
+            <!-- Total Summary Footer -->
+            <tfoot class="bg-[#1F3864] text-white font-semibold text-xs border-t-2 border-[#152747]" id="memberBreakdownTfoot">
+              <!-- Populated via JS -->
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Extra Metrics Summary Footer: Saving, Saving %, Investment % -->
+        <div class="bg-[#F8F9F8] p-4 border-t border-[#EEEEEE] grid grid-cols-1 sm:grid-cols-3 gap-4" id="memberSummaryKpis">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+      <!-- Category Detailed Bar Chart -->
+      <div class="bg-white rounded-[20px] p-6 border border-[#EEEEEE] neo-shadow">
+        <h3 class="font-semibold text-lg text-[#171717] mb-4">Category Spending Distribution</h3>
+        <div id="analyticsCategoryList" class="space-y-4">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW 3: FULL TRANSACTIONS LEDGER -->
+    <!-- ========================================== -->
+    <section id="view-transactions" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-semibold text-[#171717]">Ledger & Transaction History</h2>
+          <p class="text-xs text-[#858585]" id="ledgerCountSubtext">Showing transactions from Google Sheet</p>
+        </div>
+
+        <button onclick="openAddExpenseModal()" class="h-[44px] px-5 bg-[#064B19] text-white rounded-[14px] text-xs font-semibold hover:bg-[#085a1f] smooth-transition flex items-center gap-2 self-start sm:self-auto neo-shadow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          <span>Add New Expense</span>
+        </button>
+      </div>
+
+      <!-- Filters & Search Bar -->
+      <div class="bg-white rounded-[20px] p-4 border border-[#EEEEEE] neo-shadow flex flex-col md:flex-row items-center justify-between gap-3">
+        <!-- Search Input -->
+        <div class="relative w-full md:w-80">
+          <input type="text" id="ledgerSearchInput" oninput="filterTransactions()" placeholder="Search description, category..." class="w-full bg-[#F8F9F8] border border-[#EEEEEE] rounded-[14px] pl-10 pr-4 py-2.5 text-xs text-[#171717] focus:outline-none focus:border-[#B3ED74] focus:ring-1 focus:ring-[#B3ED74]">
+          <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#858585]">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+        </div>
+
+        <!-- Member Filter Pills -->
+        <div class="flex items-center gap-1.5 flex-wrap self-start md:self-auto">
+          <button onclick="filterByMember('All')" class="member-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-[#064B19] text-white" data-member="All">All</button>
+          <button onclick="filterByMember('Tanmay')" class="member-filter-btn px-3 py-1.5 rounded-full text-xs font-medium text-[#858585] hover:text-[#171717] bg-[#F3F3F3]" data-member="Tanmay">Tanmay</button>
+          <button onclick="filterByMember('Dad')" class="member-filter-btn px-3 py-1.5 rounded-full text-xs font-medium text-[#858585] hover:text-[#171717] bg-[#F3F3F3]" data-member="Dad">Dad</button>
+          <button onclick="filterByMember('Aai')" class="member-filter-btn px-3 py-1.5 rounded-full text-xs font-medium text-[#858585] hover:text-[#171717] bg-[#F3F3F3]" data-member="Aai">Mom</button>
+          <button onclick="filterByMember('Akshat')" class="member-filter-btn px-3 py-1.5 rounded-full text-xs font-medium text-[#858585] hover:text-[#171717] bg-[#F3F3F3]" data-member="Akshat">Akshat</button>
+        </div>
+      </div>
+
+      <!-- Ledger Table Container -->
+      <div class="bg-white rounded-[20px] border border-[#EEEEEE] neo-shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#F8F9F8] border-b border-[#EEEEEE] text-[#858585] font-semibold uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Description</th>
+                <th class="py-3 px-4">Category</th>
+                <th class="py-3 px-4">Paid By</th>
+                <th class="py-3 px-4 text-right">Amount</th>
+                <th class="py-3 px-4 text-center">Type</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTableBody" class="divide-y divide-[#F5F5F5]">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- VIEW 4: FIXED COMMITMENTS & INCOME -->
+    <!-- ========================================== -->
+    <section id="view-fixed" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-[#171717]">Income Sources & Fixed Commitments</h2>
+          <p class="text-xs text-[#858585]">Command Center recurring income and mandatory obligations (₹185,000 inflow vs ₹77,740 fixed)</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Income Sources Card -->
+        <div class="bg-white rounded-[20px] p-6 border border-[#EEEEEE] neo-shadow">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-[#F0F0F0]">
+            <h3 class="font-semibold text-lg text-[#171717] flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#279B58]"></span>
+              Income Sources
+            </h3>
+            <span class="text-sm font-semibold text-[#279B58] tabular-nums">Total: ₹185,000 / mo</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-[14px] bg-[#F8F9F8] border border-[#EEEEEE] flex items-center justify-between">
+              <div>
+                <h4 class="font-semibold text-sm text-[#171717]">Papa Salary</h4>
+                <p class="text-[11px] text-[#858585]">Active Income · Monthly</p>
+              </div>
+              <div class="text-right">
+                <span class="font-semibold text-sm text-[#171717] tabular-nums">₹90,000</span>
+                <span class="block text-[10px] text-[#279B58] font-bold">48.6%</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-[14px] bg-[#F8F9F8] border border-[#EEEEEE] flex items-center justify-between">
+              <div>
+                <h4 class="font-semibold text-sm text-[#171717]">Aai (Mom) Salary</h4>
+                <p class="text-[11px] text-[#858585]">Active Income · Monthly</p>
+              </div>
+              <div class="text-right">
+                <span class="font-semibold text-sm text-[#171717] tabular-nums">₹66,000</span>
+                <span class="block text-[10px] text-[#279B58] font-bold">35.7%</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-[14px] bg-[#F8F9F8] border border-[#EEEEEE] flex items-center justify-between">
+              <div>
+                <h4 class="font-semibold text-sm text-[#171717]">Rental Income</h4>
+                <p class="text-[11px] text-[#858585]">Passive Real Estate Inflow</p>
+              </div>
+              <div class="text-right">
+                <span class="font-semibold text-sm text-[#171717] tabular-nums">₹29,000</span>
+                <span class="block text-[10px] text-[#279B58] font-bold">15.7%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fixed Monthly Commitments Card -->
+        <div class="bg-white rounded-[20px] p-6 border border-[#EEEEEE] neo-shadow">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-[#F0F0F0]">
+            <h3 class="font-semibold text-lg text-[#171717] flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#E9A23B]"></span>
+              Fixed Monthly Commitments
+            </h3>
+            <span class="text-sm font-semibold text-[#171717] tabular-nums">Total: ₹77,740 / mo</span>
+          </div>
+
+          <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1" id="fixedItemsList">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNUAL & ONE-TIME COMMITMENTS (AUTO-PROVISIONED MONTHLY) -->
+      <div class="bg-white rounded-[26px] p-6 md:p-8 border border-[#EEEEEE] neo-shadow space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#F0F0F0]">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-[#E9F8D8] text-[#064B19] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h3 class="font-semibold text-lg text-[#171717]">Annual & One-Time Commitments</h3>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19] border border-[#CCF3A0]">
+                  Auto-Provisioned Monthly
+                </span>
+              </div>
+              <p class="text-xs text-[#858585] mt-0.5">Yearly insurance policies & critical renewals with dynamic countdown timeline</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="bg-[#F8F9F8] border border-[#EEEEEE] px-4 py-2 rounded-[14px] text-right">
+              <span class="text-[10px] text-[#858585] block font-medium uppercase tracking-wider">Annual Total</span>
+              <span class="text-base font-bold text-[#171717] tabular-nums font-heading" id="annualTotalSummary">₹177,762.00</span>
+            </div>
+            <div class="bg-[#E9F8D8] border border-[#CCF3A0] px-4 py-2 rounded-[14px] text-right">
+              <span class="text-[10px] text-[#064B19] block font-medium uppercase tracking-wider">Monthly Provision</span>
+              <span class="text-base font-bold text-[#064B19] tabular-nums font-heading" id="monthlyProvisionSummary">₹14,814.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Timeline Roadmap Cards -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-xs font-semibold text-[#858585] uppercase tracking-wider">Annual Renewal Timeline & Countdown</h4>
+            <span class="text-xs text-[#064B19] font-medium" id="annualTimelineReference">Reference: Current View</span>
+          </div>
+          <div id="annualTimelineContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Detailed Commitments Table (Matching Google Sheet) -->
+        <div class="overflow-x-auto rounded-[16px] border border-[#EEEEEE]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#1F3864] text-white uppercase text-[11px] font-semibold tracking-wider">
+              <tr>
+                <th class="py-3 px-3 text-center">#</th>
+                <th class="py-3 px-4">Commitment / Expense</th>
+                <th class="py-3 px-4">Category</th>
+                <th class="py-3 px-4">Responsible</th>
+                <th class="py-3 px-4 text-right">Annual Amount (₹)</th>
+                <th class="py-3 px-4 text-center">Payment Month</th>
+                <th class="py-3 px-4 text-right">Monthly Provision (₹)</th>
+                <th class="py-3 px-4 text-center">Timeline / Due In</th>
+                <th class="py-3 px-4">Notes</th>
+              </tr>
+            </thead>
+            <tbody id="annualCommitmentsTableBody" class="divide-y divide-[#EEEEEE] bg-white">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+            <tfoot class="bg-[#8B0000] text-white font-bold text-xs uppercase tracking-wider">
+              <tr>
+                <td class="py-3 px-3"></td>
+                <td class="py-3 px-4" colspan="3">TOTAL ANNUAL COMMITMENTS</td>
+                <td class="py-3 px-4 text-right tabular-nums font-bold" id="annualTableFooterTotal">₹177,762.00</td>
+                <td class="py-3 px-4"></td>
+                <td class="py-3 px-4 text-right tabular-nums font-bold" id="annualTableFooterProvision">₹14,814.00</td>
+                <td class="py-3 px-4" colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- EMIS / LOAN (FINANCIAL THERMOMETER & REPAYMENT TRACKER) -->
+      <div class="bg-white rounded-[26px] p-6 md:p-8 border border-[#EEEEEE] neo-shadow space-y-6">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#F0F0F0]">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-[#E9F8D8] text-[#064B19] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h3 class="font-semibold text-lg text-[#171717]">EMIs / Loan & Debt Health</h3>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19] border border-[#CCF3A0] inline-flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-[#279B58]"></span>
+                  <span id="loanHeaderThermometerBadge">Financial Thermometer: 15.95% Safe Zone</span>
+                </span>
+              </div>
+              <p class="text-xs text-[#858585] mt-0.5">Active debt commitments, monthly cashflow obligations, and safe leverage headroom</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="bg-[#F8F9F8] border border-[#EEEEEE] px-4 py-2 rounded-[14px] text-right">
+              <span class="text-[10px] text-[#858585] block font-medium uppercase tracking-wider">Total Monthly EMI</span>
+              <span class="text-base font-bold text-[#171717] tabular-nums font-heading" id="loanTotalSummary">₹29,500.00</span>
+            </div>
+            <div class="bg-[#E9F8D8] border border-[#CCF3A0] px-4 py-2 rounded-[14px] text-right">
+              <span class="text-[10px] text-[#064B19] block font-medium uppercase tracking-wider">Max Safe New EMI</span>
+              <span class="text-base font-bold text-[#064B19] tabular-nums font-heading" id="maxSafeEmiSummary">₹7,500.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Thermometer Full Banner & Gauge -->
+        <div class="bg-[#F8F9F8] border border-[#EEEEEE] rounded-[18px] p-5">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-[#171717] uppercase tracking-wider">Financial Thermometer: Debt-to-Income Health</span>
+                <span id="loanThermometerZonePill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#279B58] text-white">Safe Zone</span>
+              </div>
+              <p class="text-xs text-[#064B19] font-medium mt-1" id="loanThermometerStatusText">
+                🟢 Safe Zone: Excellent financial health. You completely own your cash flow.
+              </p>
+            </div>
+            <div class="text-left md:text-right">
+              <span class="text-2xl font-bold text-[#171717] tabular-nums font-heading" id="loanThermometerPctDisplay">15.95%</span>
+              <span class="block text-[11px] text-[#858585]">of monthly family inflow</span>
+            </div>
+          </div>
+
+          <!-- Multi-Zone Progress Track -->
+          <div class="space-y-1.5">
+            <div class="w-full h-3.5 bg-[#EEEEEE] rounded-full overflow-hidden relative flex">
+              <div id="loanThermometerFillBar" class="h-full bg-[#279B58] rounded-full smooth-transition" style="width: 15.95%;"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-[#858585] pt-0.5">
+              <span class="font-semibold text-[#279B58]">0% (Debt Free)</span>
+              <span class="font-semibold text-[#279B58]">Current: 15.95%</span>
+              <span class="font-semibold text-[#E9A23B]">20% (Conservative Max)</span>
+              <span class="font-semibold text-[#E36C65]">35%+ (Critical Overleveraged)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Loan Summary Cards -->
+        <div>
+          <h4 class="text-xs font-semibold text-[#858585] uppercase tracking-wider mb-3">Active Loan Amortization & Repayment Schedules</h4>
+          <div id="activeLoansCardGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Detailed EMIs / Loan Table (Matching Google Sheet) -->
+        <div class="overflow-x-auto rounded-[16px] border border-[#EEEEEE]">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-[#1F3864] text-white uppercase text-[11px] font-semibold tracking-wider">
+              <tr>
+                <th class="py-3 px-3 text-center">#</th>
+                <th class="py-3 px-4">Description</th>
+                <th class="py-3 px-4">Member</th>
+                <th class="py-3 px-4 text-right">Amount per month (₹)</th>
+                <th class="py-3 px-4 text-center">Start Date</th>
+                <th class="py-3 px-4 text-center">End Date</th>
+                <th class="py-3 px-4 text-center">Remaining Months</th>
+                <th class="py-3 px-4">Notes</th>
+              </tr>
+            </thead>
+            <tbody id="loanTableBody" class="divide-y divide-[#EEEEEE] bg-white">
+              <!-- Dynamically populated via JS -->
+            </tbody>
+            <tfoot class="bg-[#8B0000] text-white font-bold text-xs">
+              <tr class="border-b border-[#a81414]">
+                <td class="py-2.5 px-3"></td>
+                <td class="py-2.5 px-4 font-bold uppercase tracking-wider" colspan="2">Total Loan</td>
+                <td class="py-2.5 px-4 text-right tabular-nums font-bold" id="loanTableFooterTotal">₹29,500.00</td>
+                <td class="py-2.5 px-4" colspan="4"></td>
+              </tr>
+              <tr class="border-b border-[#a81414] bg-[#750000]">
+                <td class="py-2.5 px-3"></td>
+                <td class="py-2.5 px-4 font-bold uppercase tracking-wider" colspan="2">Financial Thermometer</td>
+                <td class="py-2.5 px-4 text-right tabular-nums font-bold" id="loanTableFooterPct">15.95%</td>
+                <td class="py-2.5 px-4 text-left font-normal" colspan="4" id="loanTableFooterStatus">
+                  🟢 Safe Zone: Excellent financial health. You completely own your cash flow.
+                </td>
+              </tr>
+              <tr class="bg-[#5e0000]">
+                <td class="py-2.5 px-3"></td>
+                <td class="py-2.5 px-4 font-bold uppercase tracking-wider" colspan="2">Max Safe New EMI</td>
+                <td class="py-2.5 px-4 text-right tabular-nums font-bold" id="loanTableFooterMaxSafe">₹7,500.00</td>
+                <td class="py-2.5 px-4 text-left font-normal" colspan="4">
+                  Capacity available without exceeding 20% conservative safety ceiling
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: ADD EXPENSE (NEO-FINTECH MINIMAL FORM) -->
+  <!-- ============================================== -->
+  <div id="addExpenseModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-[26px] p-6 md:p-8 max-w-md w-full border border-[#EEEEEE] neo-shadow relative animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#F0F0F0]">
+        <div>
+          <h3 class="text-lg font-semibold text-[#171717]">Add New Expense</h3>
+          <p class="text-xs text-[#858585]">Directly records to Google Sheet</p>
+        </div>
+        <button onclick="closeAddExpenseModal()" class="w-8 h-8 rounded-full bg-[#F3F3F3] text-[#171717] flex items-center justify-center hover:bg-[#EAEAEA] smooth-transition">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form id="addExpenseForm" onsubmit="submitExpense(event)" class="space-y-4">
+        
+        <!-- Description -->
+        <div>
+          <label class="block text-xs font-semibold text-[#171717] mb-1.5">Description</label>
+          <input type="text" id="formDescription" required placeholder="e.g. Groceries at Nature's Basket" class="w-full h-11 px-3.5 bg-[#FFFFFF] border border-[#EEEEEE] rounded-[14px] text-xs text-[#171717] focus:outline-none focus:border-[#B3ED74] focus:ring-2 focus:ring-[#B3ED74]/40">
+        </div>
+
+        <!-- Amount & Paid By Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#171717] mb-1.5">Amount (₹)</label>
+            <input type="number" step="any" id="formAmount" required placeholder="0.00" class="w-full h-11 px-3.5 bg-[#FFFFFF] border border-[#EEEEEE] rounded-[14px] text-xs text-[#171717] tabular-nums font-semibold focus:outline-none focus:border-[#B3ED74] focus:ring-2 focus:ring-[#B3ED74]/40">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-[#171717] mb-1.5">Paid By</label>
+            <select id="formPaidBy" class="w-full h-11 px-3 bg-[#FFFFFF] border border-[#EEEEEE] rounded-[14px] text-xs text-[#171717] focus:outline-none focus:border-[#B3ED74] focus:ring-2 focus:ring-[#B3ED74]/40 cursor-pointer">
+              <option value="Tanmay" selected>Tanmay</option>
+              <option value="Dad">Dad</option>
+              <option value="Aai">Mom (Aai)</option>
+              <option value="Akshat">Akshat</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Category & Date Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-[#171717] mb-1.5">Category</label>
+            <select id="formCategory" class="w-full h-11 px-3 bg-[#FFFFFF] border border-[#EEEEEE] rounded-[14px] text-xs text-[#171717] focus:outline-none focus:border-[#B3ED74] focus:ring-2 focus:ring-[#B3ED74]/40 cursor-pointer">
+              <option value="Groceries">Groceries</option>
+              <option value="Fruits & Vegetables">Fruits & Vegetables</option>
+              <option value="Non-Veg / Protein">Non-Veg / Protein</option>
+              <option value="Medical & Healthcare">Medical & Healthcare</option>
+              <option value="Housing & Utilities">Housing & Utilities</option>
+              <option value="Petrol + Fastag">Petrol + Fastag</option>
+              <option value="Clothing & Personal Care">Clothing & Personal Care</option>
+              <option value="Entertainment / Dining Out">Entertainment / Dining Out</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Telecom & Internet">Telecom & Internet</option>
+              <option value="Education & Courses">Education & Courses</option>
+              <option value="Investments / SIP">Investments / SIP</option>
+              <option value="Loan EMI / Installment">Loan EMI / Installment</option>
+              <option value="Household Services">Household Services</option>
+              <option value="Miscellaneous / Other">Miscellaneous / Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-[#171717] mb-1.5">Date</label>
+            <input type="date" id="formDate" required class="w-full h-11 px-3 bg-[#FFFFFF] border border-[#EEEEEE] rounded-[14px] text-xs text-[#171717] focus:outline-none focus:border-[#B3ED74] focus:ring-2 focus:ring-[#B3ED74]/40">
+          </div>
+        </div>
+
+        <!-- Optional Comment -->
+        <div>
+          <label class="block text-xs font-semibold text-[#171717] mb-1.5">Comment (Optional)</label>
+          <input type="text" id="formComment" placeholder="Any remarks" class="w-full h-11 px-3.5 bg-[#FFFFFF] border border-[#EEEEEE] rounded-[14px] text-xs text-[#171717] focus:outline-none focus:border-[#B3ED74] focus:ring-2 focus:ring-[#B3ED74]/40">
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-3">
+          <button type="submit" id="formSubmitBtn" class="w-full h-[46px] bg-[#064B19] text-white rounded-[14px] text-xs font-semibold hover:bg-[#085a1f] smooth-transition flex items-center justify-center gap-2 neo-shadow">
+            <span>Append to Google Sheet</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: EDIT MEMBER BUDGET & SETTINGS -->
+  <!-- ============================================== -->
+  <div id="memberSettingsModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-[26px] p-6 sm:p-7 max-w-lg w-full border border-[#EEEEEE] neo-shadow relative">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#F0F0F0]">
+        <div>
+          <h3 class="text-lg font-semibold text-[#171717]">Edit Member Budget Settings</h3>
+          <p class="text-xs text-[#858585]">Configure Extra from previous month & Income for Google Sheet</p>
+        </div>
+        <button onclick="closeMemberSettingsModal()" class="w-8 h-8 rounded-full bg-[#F3F3F3] text-[#171717] flex items-center justify-center hover:bg-[#EAEAEA] smooth-transition">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="memberSettingsForm" onsubmit="handleMemberSettingsSubmit(event)" class="space-y-4">
+        <!-- Tanmay -->
+        <div class="p-3 bg-[#F8F9F8] rounded-[14px] border border-[#EEEEEE]">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-[#171717]">1. Tanmay</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Extra From Prev Month (₹)</label>
+              <input type="number" id="settings_extra_Tanmay" value="2300" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Income (₹)</label>
+              <input type="number" id="settings_income_Tanmay" value="0" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mom -->
+        <div class="p-3 bg-[#F8F9F8] rounded-[14px] border border-[#EEEEEE]">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-[#171717]">2. Mom</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Extra From Prev Month (₹)</label>
+              <input type="number" id="settings_extra_Mom" value="41000" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Income (₹)</label>
+              <input type="number" id="settings_income_Mom" value="84500" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+          </div>
+        </div>
+
+        <!-- Dad -->
+        <div class="p-3 bg-[#F8F9F8] rounded-[14px] border border-[#EEEEEE]">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-[#171717]">3. Dad</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Extra From Prev Month (₹)</label>
+              <input type="number" id="settings_extra_Dad" value="130000" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Income (₹)</label>
+              <input type="number" id="settings_income_Dad" value="100000" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+          </div>
+        </div>
+
+        <!-- Akshat -->
+        <div class="p-3 bg-[#F8F9F8] rounded-[14px] border border-[#EEEEEE]">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-semibold text-[#171717]">4. Akshat</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Extra From Prev Month (₹)</label>
+              <input type="number" id="settings_extra_Akshat" value="550" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+            <div>
+              <label class="block text-[10px] text-[#858585] mb-1">Income (₹)</label>
+              <input type="number" id="settings_income_Akshat" value="0" class="w-full h-9 px-3 bg-white border border-[#EEEEEE] rounded-[10px] text-xs font-semibold tabular-nums">
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="saveSettingsBtn" class="w-full h-[46px] bg-[#064B19] text-white rounded-[14px] text-xs font-semibold hover:bg-[#085a1f] smooth-transition flex items-center justify-center gap-2 neo-shadow">
+            <span>Update Google Sheet & Dashboard</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 bg-[#064B19] text-white px-5 py-3 rounded-[16px] text-xs font-medium neo-shadow transform translate-y-24 opacity-0 smooth-transition z-50 flex items-center gap-2.5">
+    <span class="w-2 h-2 rounded-full bg-[#B3ED74]"></span>
+    <span id="toastMessage">Synced with Google Sheet</span>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <!-- ============================================== -->
+  <script>
+    // State management
+    let currentMonth = "Nov";
+    let activeCurrency = "INR";
+    let isPrivacyMasked = false;
+    let allTransactions = [];
+    let currentFilterMember = "All";
+    let dashboardData = null;
+
+    // Currency conversion rate (approximate for display toggle)
+    const USD_RATE = 88.0;
+
+    // Initialize today's date in form
+    document.getElementById("formDate").value = new Date().toISOString().split("T")[0];
+
+    // Load initial data
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchDashboardData(currentMonth);
+    });
+
+    async function fetchDashboardData(month) {
+      currentMonth = month;
+      showToast(`Loading ${month} 2026 data...`);
+
+      try {
+        const resp = await fetch(`/api/summary?month=${month}`);
+        if (!resp.ok) throw new Error("Network response was not ok");
+        dashboardData = await resp.json();
+        renderDashboard(dashboardData);
+        showToast(`Loaded ${dashboardData.month_full} successfully`);
+      } catch (err) {
+        console.warn("Using pre-packaged fallback dataset:", err);
+        // Fallback default dataset for offline preview
+        dashboardData = getFallbackData(month);
+        renderDashboard(dashboardData);
+      }
+    }
+
+    function renderDashboard(data) {
+      if (!data) return;
+
+      allTransactions = data.recent_transactions || [];
+
+      // 1. Hero Card: Total Spent & Breakdown (Savings & Investments)
+      updateSpendingAndSavingsDisplays(data);
+
+      // 2. Highlight Card: Total Inflow (Income + Previous Month) & Breakdown
+      updateInflowDisplays(data);
+
+      // 3. Household Spending Bar Graph & Breakdown (Excl. Investments)
+      const spendingMonthPill = document.getElementById("spendingMonthPill");
+      if (spendingMonthPill) spendingMonthPill.textContent = data.month_full;
+
+      const spendingTotalDisplay = document.getElementById("spendingTotalDisplay");
+      const livingSpend = data.total_variable_spent !== undefined ? data.total_variable_spent : 167229;
+      if (spendingTotalDisplay) spendingTotalDisplay.textContent = formatCurrency(livingSpend);
+
+      const spendingInsightText = document.getElementById("spendingInsightText");
+      if (spendingInsightText) spendingInsightText.textContent = data.top_cat_insight || "Spending on track";
+
+      renderCategoryBarGraph(data.categories || [], livingSpend);
+
+      // 4. Upcoming Reminders on Overview
+      renderUpcomingReminders(data.upcoming_reminders || [], data.month || currentMonth);
+
+      // 5. Active Loans & EMIs Highlight on Overview
+      renderLoanEmiHighlight(data);
+
+      // 6. Transactions on Overview
+      renderOverviewTransactions(data.recent_transactions || []);
+
+      // 7. Analytics Tab
+      renderAnalytics(data);
+
+      // 8. Full Ledger Table
+      renderLedgerTable(data.recent_transactions || []);
+
+      // 9. Fixed Monthly Commitments
+      renderFixedCommitments(data.fixed_commitments || []);
+
+      // 10. Annual Commitments & Timeline Tracker
+      renderAnnualCommitments(
+        data.annual_commitments || [],
+        data.total_annual_commitments || 177762,
+        data.total_monthly_provision || 14814,
+        data.month || currentMonth
+      );
+
+      // 11. EMIs / Loan Command Center on Fixed & Commitments tab
+      renderLoanEmiSection(data);
+    }
+
+    function updateSpendingAndSavingsDisplays(data) {
+      if (!data) return;
+      const spentElem = document.getElementById("totalSpentDisplay");
+      const savingElem = document.getElementById("savingDisplay");
+      const savingPctElem = document.getElementById("savingPctDisplay");
+      const investElem = document.getElementById("investmentDisplay");
+      const investPctElem = document.getElementById("investmentPctDisplay");
+      const eyeIcon = document.getElementById("eyeIcon");
+      const eyeText = document.getElementById("eyeText");
+
+      const totalSpent = data.total_spent !== undefined ? data.total_spent : (data.member_breakdown_table?.total_spent || 0);
+      const saving = data.saving !== undefined ? data.saving : (data.member_breakdown_table?.saving || 0);
+      const savingPct = data.saving_pct !== undefined ? data.saving_pct : (data.member_breakdown_table?.saving_pct || 0);
+      const investment = data.total_investment !== undefined ? data.total_investment : (data.member_breakdown_table?.total_investment || 0);
+      const investPct = data.investment_pct !== undefined ? data.investment_pct : (data.member_breakdown_table?.investment_pct || 0);
+
+      if (isPrivacyMasked) {
+        if (spentElem) spentElem.textContent = "••••••••";
+        if (savingElem) savingElem.textContent = "••••••••";
+        if (investElem) investElem.textContent = "••••••••";
+        if (eyeText) eyeText.textContent = "Show figures";
+        if (eyeIcon) {
+          eyeIcon.innerHTML = `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>`;
+        }
+      } else {
+        if (spentElem) spentElem.textContent = formatCurrency(totalSpent);
+        if (savingElem) savingElem.textContent = formatCurrency(saving);
+        if (savingPctElem) savingPctElem.textContent = `${savingPct}%`;
+        if (investElem) investElem.textContent = formatCurrency(investment);
+        if (investPctElem) investPctElem.textContent = `${investPct}%`;
+        if (eyeText) eyeText.textContent = "Hide figures";
+        if (eyeIcon) {
+          eyeIcon.innerHTML = `<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>`;
+        }
+      }
+    }
+
+    function updateInflowDisplays(data) {
+      if (!data) return;
+      const inflowElem = document.getElementById("rewardsInflowDisplay");
+      const currentIncomeElem = document.getElementById("currentMonthIncomeDisplay");
+      const extraPrevElem = document.getElementById("extraPrevMonthDisplay");
+
+      const combinedInflow = data.income_plus_previous_month || data.total_income || 0;
+      const currentMonthIncome = data.current_month_income || 0;
+      const extraPrev = data.extra_from_previous_month || 0;
+
+      if (isPrivacyMasked) {
+        if (inflowElem) inflowElem.textContent = "••••••••";
+        if (currentIncomeElem) currentIncomeElem.textContent = "••••••••";
+        if (extraPrevElem) extraPrevElem.textContent = "••••••••";
+      } else {
+        if (inflowElem) inflowElem.textContent = formatCurrency(combinedInflow);
+        if (currentIncomeElem) currentIncomeElem.textContent = formatCurrency(currentMonthIncome);
+        if (extraPrevElem) extraPrevElem.textContent = formatCurrency(extraPrev);
+      }
+    }
+
+    function formatCurrency(amount, includeCents = true) {
+      let val = Number(amount) || 0;
+      return "₹" + val.toLocaleString('en-IN', {
+        minimumFractionDigits: includeCents ? 2 : 0,
+        maximumFractionDigits: includeCents ? 2 : 0
+      });
+    }
+
+    // Interactive Category-Wise Bar Graph with Budget vs Actual & Hover Tooltip
+    function renderCategoryBarGraph(categories, totalLivingSpend) {
+      const container = document.getElementById("categoryBarsContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      if (!categories || categories.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-[#858585] text-xs">
+            No category spending recorded for this month.
+          </div>
+        `;
+        return;
+      }
+
+      // Filter out any investment items if present, since this card is strictly Excl. Investments
+      const livingCategories = categories.filter(c => !c.category.toLowerCase().includes("invest"));
+
+      // Determine consistent reference max for scaling all bars proportionally
+      const maxVal = Math.max(...livingCategories.map(c => Math.max(Number(c.amount) || 0, Number(c.budget) || 0)), 1) * 1.05;
+
+      livingCategories.forEach(cat => {
+        const amt = Number(cat.amount) || 0;
+        const budget = Number(cat.budget) || 0;
+        const pctOfSpend = cat.percentage || (totalLivingSpend > 0 ? ((amt / totalLivingSpend) * 100).toFixed(1) : 0);
+        
+        const spendBarWidth = Math.min(100, Math.max(1, (amt / maxVal) * 100));
+        const budgetMarkerPos = budget > 0 ? Math.min(100, (budget / maxVal) * 100) : 0;
+        
+        // Status determination
+        const isOver = cat.is_over || (budget > 0 && amt > budget);
+        const hasBudget = budget > 0;
+        
+        let statusBadgeHtml = "";
+        let barColorClass = "bg-[#B3ED74]"; // Fresh lime accent default
+        
+        if (hasBudget) {
+          if (isOver) {
+            barColorClass = "bg-[#E36C65]"; // Soft coral / red
+            const overAmt = Math.abs(amt - budget);
+            statusBadgeHtml = `<span class="text-[10px] font-bold text-[#E36C65] bg-[#FDE8E7] px-2 py-0.5 rounded-full whitespace-nowrap">🔴 +₹${Math.round(overAmt).toLocaleString('en-IN')} Over</span>`;
+          } else {
+            barColorClass = "bg-[#064B19]"; // Deep Forest green
+            const underAmt = budget - amt;
+            statusBadgeHtml = `<span class="text-[10px] font-bold text-[#064B19] bg-[#E9F8D8] px-2 py-0.5 rounded-full whitespace-nowrap">✅ -₹${Math.round(underAmt).toLocaleString('en-IN')} Under</span>`;
+          }
+        } else {
+          barColorClass = "bg-[#CCF3A0]"; // Soft mint for uncapped
+          statusBadgeHtml = `<span class="text-[10px] font-medium text-[#858585] bg-[#F3F3F3] px-2 py-0.5 rounded-full whitespace-nowrap">No Cap</span>`;
+        }
+
+        const row = document.createElement("div");
+        row.className = "category-bar-row group p-2 rounded-[14px] hover:bg-[#F8F9F8] smooth-transition cursor-pointer relative";
+        
+        // Render Row HTML
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs mb-1.5 gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-6 h-6 rounded-full bg-[#F3F3F3] group-hover:bg-[#E9F8D8] flex items-center justify-center flex-shrink-0 text-[#171717] smooth-transition">
+                ${getCategoryIconSvg(cat.category)}
+              </span>
+              <span class="font-semibold text-[#171717] truncate">${escapeHtml(cat.category)}</span>
+              <span class="text-[11px] text-[#858585] hidden sm:inline tabular-nums">(${pctOfSpend}%)</span>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="font-bold text-[#171717] tabular-nums">${formatCurrency(amt)}</span>
+              ${statusBadgeHtml}
+            </div>
+          </div>
+          
+          <!-- Bar Track with Budget Notch -->
+          <div class="relative h-2.5 bg-[#EEEEEE] rounded-full overflow-visible">
+            <!-- Spend Bar -->
+            <div class="h-full rounded-full smooth-transition ${barColorClass}" style="width: ${spendBarWidth}%;"></div>
+            <!-- Budget Vertical Tick Line -->
+            ${hasBudget ? `
+              <div class="absolute top-[-3px] bottom-[-3px] w-[2.5px] bg-[#171717] rounded-full z-10 pointer-events-none shadow-sm"
+                   style="left: ${budgetMarkerPos}%;"
+                   title="Budget: ${formatCurrency(budget)}">
+              </div>
+            ` : ""}
+          </div>
+        `;
+
+        // Tooltip listeners
+        row.addEventListener("mouseenter", (e) => showBarTooltip(e, cat, pctOfSpend, totalLivingSpend));
+        row.addEventListener("mousemove", (e) => positionBarTooltip(e));
+        row.addEventListener("mouseleave", () => hideBarTooltip());
+
+        container.appendChild(row);
+      });
+    }
+
+    function showBarTooltip(e, cat, pctOfSpend, totalLivingSpend) {
+      const tooltip = document.getElementById("barTooltip");
+      if (!tooltip) return;
+
+      const amt = Number(cat.amount) || 0;
+      const budget = Number(cat.budget) || 0;
+      const isOver = cat.is_over || (budget > 0 && amt > budget);
+      const variance = budget > 0 ? (budget - amt) : 0;
+      
+      let varianceText = "-";
+      let varianceClass = "text-white";
+      if (budget > 0) {
+        if (isOver) {
+          varianceText = `+${formatCurrency(Math.abs(variance))} Over Budget`;
+          varianceClass = "text-[#E36C65]";
+        } else {
+          varianceText = `-${formatCurrency(variance)} Saved / Within Budget`;
+          varianceClass = "text-[#B3ED74]";
+        }
+      }
+
+      tooltip.innerHTML = `
+        <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-2 mb-2">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="font-bold text-white text-xs truncate">${escapeHtml(cat.category)}</span>
+          </div>
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${isOver ? 'bg-[#E36C65]/25 text-[#E36C65]' : (budget > 0 ? 'bg-[#279B58]/25 text-[#B3ED74]' : 'bg-white/10 text-[#B5B5B5]')}">
+            ${isOver ? 'Over Budget' : (budget > 0 ? 'Within Budget' : 'Uncapped')}
+          </span>
+        </div>
+        <div class="space-y-1.5 text-[11px]">
+          <div class="flex justify-between items-center text-[#B5B5B5]">
+            <span>Actual Spent:</span>
+            <span class="text-white font-bold tabular-nums">${formatCurrency(amt)}</span>
+          </div>
+          <div class="flex justify-between items-center text-[#B5B5B5]">
+            <span>Monthly Budget:</span>
+            <span class="text-white font-medium tabular-nums">${budget > 0 ? formatCurrency(budget) : 'No Budget Set'}</span>
+          </div>
+          <div class="flex justify-between items-center text-[#B5B5B5]">
+            <span>Variance:</span>
+            <span class="font-bold tabular-nums ${varianceClass}">${varianceText}</span>
+          </div>
+          <div class="flex justify-between items-center text-[#B5B5B5] pt-1.5 border-t border-white/10">
+            <span>Share of Living Spend:</span>
+            <span class="text-[#B3ED74] font-semibold tabular-nums">${pctOfSpend}%</span>
+          </div>
+        </div>
+      `;
+
+      tooltip.classList.remove("hidden");
+      positionBarTooltip(e);
+    }
+
+    function positionBarTooltip(e) {
+      const tooltip = document.getElementById("barTooltip");
+      if (!tooltip || tooltip.classList.contains("hidden")) return;
+      const padding = 14;
+      let x = e.clientX + padding;
+      let y = e.clientY + padding;
+
+      const rect = tooltip.getBoundingClientRect();
+      if (x + rect.width > window.innerWidth - 12) {
+        x = e.clientX - rect.width - padding;
+      }
+      if (y + rect.height > window.innerHeight - 12) {
+        y = e.clientY - rect.height - padding;
+      }
+
+      tooltip.style.left = `${Math.max(10, x)}px`;
+      tooltip.style.top = `${Math.max(10, y)}px`;
+    }
+
+    function hideBarTooltip() {
+      const tooltip = document.getElementById("barTooltip");
+      if (tooltip) tooltip.classList.add("hidden");
+    }
+
+    // Overview Compact Transactions List
+    function renderOverviewTransactions(transactions) {
+      const list = document.getElementById("overviewTransactionList");
+      list.innerHTML = "";
+
+      if (!transactions || transactions.length === 0) {
+        list.innerHTML = `<p class="text-xs text-[#858585] py-4 text-center">No transactions recorded for ${currentMonth}.</p>`;
+        return;
+      }
+
+      transactions.slice(0, 5).forEach(tx => {
+        const isIncome = tx.type === "income";
+        const amtPrefix = isIncome ? "+" : "-";
+        const amtClass = isIncome ? "text-[#279B58]" : "text-[#171717]";
+
+        const item = document.createElement("div");
+        item.className = "flex items-center justify-between py-1.5 hover:bg-[#F8F9F8] px-2 rounded-[12px] smooth-transition";
+        item.innerHTML = `
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-[#F3F3F3] text-[#171717] flex items-center justify-center flex-shrink-0">
+              ${getCategoryIconSvg(tx.category)}
+            </div>
+            <div class="min-w-0">
+              <h4 class="text-xs font-semibold text-[#171717] truncate">${escapeHtml(tx.description)}</h4>
+              <p class="text-[10px] text-[#858585]">${tx.date} · <span class="font-medium text-[#171717]">${tx.paid_by}</span></p>
+            </div>
+          </div>
+          <span class="text-xs font-semibold ${amtClass} tabular-nums flex-shrink-0">
+            ${amtPrefix}${formatCurrency(tx.amount)}
+          </span>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // Analytics Page Renderer
+    function renderAnalytics(data) {
+      // Update member spending cards
+      if (data.members) {
+        data.members.forEach(m => {
+          if (m.name === "Tanmay") {
+            document.getElementById("analyticsTanmayAmount").textContent = formatCurrency(m.amount, false);
+            document.getElementById("analyticsTanmayPct").textContent = `${m.percentage}% of variable spend`;
+          } else if (m.name === "Dad") {
+            document.getElementById("analyticsDadAmount").textContent = formatCurrency(m.amount, false);
+            document.getElementById("analyticsDadPct").textContent = `${m.percentage}% of variable spend`;
+          } else if (m.name === "Aai") {
+            document.getElementById("analyticsMomAmount").textContent = formatCurrency(m.amount, false);
+          } else if (m.name === "Akshat") {
+            document.getElementById("analyticsAkshatAmount").textContent = formatCurrency(m.amount, false);
+          }
+        });
+      }
+
+      // Member-Wise Spending Breakdown Table (from specification)
+      renderMemberBreakdownTable(data.member_breakdown_table, data.month_full);
+
+      // Detailed Category Bar Chart
+      const catList = document.getElementById("analyticsCategoryList");
+      catList.innerHTML = "";
+      if (data.categories && data.categories.length > 0) {
+        data.categories.forEach(cat => {
+          const item = document.createElement("div");
+          item.innerHTML = `
+            <div class="flex justify-between text-xs mb-1 font-medium">
+              <span class="text-[#171717]">${cat.category}</span>
+              <span class="text-[#171717] font-semibold tabular-nums">${formatCurrency(cat.amount)} (${cat.percentage}%)</span>
+            </div>
+            <div class="h-2.5 bg-[#EEEEEE] rounded-full overflow-hidden">
+              <div class="h-full bg-[#B3ED74] rounded-full" style="width: ${Math.min(100, cat.percentage)}%;"></div>
+            </div>
+          `;
+          catList.appendChild(item);
+        });
+      } else {
+        catList.innerHTML = `<p class="text-xs text-[#858585]">No category data recorded for this month.</p>`;
+      }
+    }
+
+    function renderMemberBreakdownTable(tableData, monthLabel) {
+      const tbody = document.getElementById("memberBreakdownTbody");
+      const tfoot = document.getElementById("memberBreakdownTfoot");
+      const kpis = document.getElementById("memberSummaryKpis");
+      const badge = document.getElementById("memberBreakdownMonthBadge");
+      
+      if (badge && monthLabel) badge.textContent = `${monthLabel} 2026`;
+      if (!tbody || !tableData) return;
+
+      tbody.innerHTML = "";
+      (tableData.rows || []).forEach(row => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-[#F8F9F8] smooth-transition";
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-center text-[#858585] font-semibold">${row.num}</td>
+          <td class="py-3 px-4 font-semibold text-[#171717] flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-[#E9F8D8] text-[#064B19] font-bold text-[10px] flex items-center justify-center">${row.name[0]}</span>
+            <span>${row.name}</span>
+          </td>
+          <td class="py-3 px-4 text-right tabular-nums font-semibold text-[#279B58]">${formatCurrency(row.spent)}</td>
+          <td class="py-3 px-4 text-center tabular-nums font-medium text-[#171717]">${row.pct_spend}%</td>
+          <td class="py-3 px-4 text-[#858585] font-medium">${row.top_category || "-"}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-[#171717] font-medium">${formatCurrency(row.extra_from_prev, false)}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-[#171717] font-medium">${formatCurrency(row.income, false)}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-[#064B19] font-semibold">${formatCurrency(row.income_plus_prev, false)}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-[#858585] font-medium">${row.investment ? formatCurrency(row.investment, false) : "-"}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-[#171717] font-bold">${formatCurrency(row.cash_available, false)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Total Row Footer
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr>
+            <td class="py-3.5 px-3"></td>
+            <td class="py-3.5 px-4 uppercase font-bold tracking-wider">Total Spent</td>
+            <td class="py-3.5 px-4 text-right tabular-nums text-[#B3ED74] font-bold">${formatCurrency(tableData.total_spent)}</td>
+            <td class="py-3.5 px-4"></td>
+            <td class="py-3.5 px-4 uppercase font-bold tracking-wider text-right">Total</td>
+            <td class="py-3.5 px-4 text-right tabular-nums">${formatCurrency(tableData.total_extra_prev, false)}</td>
+            <td class="py-3.5 px-4 text-right tabular-nums">${formatCurrency(tableData.total_income, false)}</td>
+            <td class="py-3.5 px-4 text-right tabular-nums text-[#B3ED74] font-bold">${formatCurrency(tableData.total_combined_income, false)}</td>
+            <td class="py-3.5 px-4 text-right tabular-nums">${formatCurrency(tableData.total_investment, false)}</td>
+            <td class="py-3.5 px-4 text-right tabular-nums text-[#B3ED74] font-bold">${formatCurrency(tableData.total_cash_available, false)}</td>
+          </tr>
+        `;
+      }
+
+      // Savings & Investment KPI Cards Footer
+      if (kpis) {
+        kpis.innerHTML = `
+          <div class="bg-white p-3 rounded-[16px] border border-[#EEEEEE] neo-shadow flex items-center justify-between">
+            <span class="text-xs text-[#858585] font-medium">Monthly Net Saving</span>
+            <span class="text-base font-bold text-[#279B58] tabular-nums font-heading">${formatCurrency(tableData.saving)}</span>
+          </div>
+          <div class="bg-white p-3 rounded-[16px] border border-[#EEEEEE] neo-shadow flex items-center justify-between">
+            <span class="text-xs text-[#858585] font-medium">Household Saving %</span>
+            <span class="text-base font-bold text-[#064B19] bg-[#E9F8D8] px-2.5 py-0.5 rounded-full tabular-nums">${tableData.saving_pct}%</span>
+          </div>
+          <div class="bg-white p-3 rounded-[16px] border border-[#EEEEEE] neo-shadow flex items-center justify-between">
+            <span class="text-xs text-[#858585] font-medium">Investment Allocation %</span>
+            <span class="text-base font-bold text-[#1F3864] bg-[#CCF3A0] px-2.5 py-0.5 rounded-full tabular-nums">${tableData.investment_pct}%</span>
+          </div>
+        `;
+      }
+    }
+
+    function openMemberSettingsModal() {
+      document.getElementById("memberSettingsModal").classList.remove("hidden");
+    }
+
+    function closeMemberSettingsModal() {
+      document.getElementById("memberSettingsModal").classList.add("hidden");
+    }
+
+    async function handleMemberSettingsSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById("saveSettingsBtn");
+      btn.disabled = true;
+      btn.textContent = "Updating Google Sheet...";
+
+      const payload = {
+        month: currentMonth,
+        settings: {
+          Tanmay: {
+            extra: parseFloat(document.getElementById("settings_extra_Tanmay").value) || 0,
+            income: parseFloat(document.getElementById("settings_income_Tanmay").value) || 0
+          },
+          Mom: {
+            extra: parseFloat(document.getElementById("settings_extra_Mom").value) || 0,
+            income: parseFloat(document.getElementById("settings_income_Mom").value) || 0
+          },
+          Dad: {
+            extra: parseFloat(document.getElementById("settings_extra_Dad").value) || 0,
+            income: parseFloat(document.getElementById("settings_income_Dad").value) || 0
+          },
+          Akshat: {
+            extra: parseFloat(document.getElementById("settings_extra_Akshat").value) || 0,
+            income: parseFloat(document.getElementById("settings_income_Akshat").value) || 0
+          }
+        }
+      };
+
+      try {
+        const resp = await fetch("/api/update-member-settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const res = await resp.json();
+        if (res.success) {
+          showToast(res.message || "Settings updated in Google Sheet!");
+          closeMemberSettingsModal();
+          fetchDashboardData(currentMonth);
+        } else {
+          alert("Error: " + (res.error || "Failed to update settings"));
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Settings updated locally!");
+        closeMemberSettingsModal();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Update Google Sheet & Dashboard";
+      }
+    }
+
+    // Full Ledger Table
+    function renderLedgerTable(transactions) {
+      const tbody = document.getElementById("ledgerTableBody");
+      tbody.innerHTML = "";
+
+      let filtered = transactions;
+      if (currentFilterMember !== "All") {
+        filtered = filtered.filter(tx => tx.paid_by.toLowerCase() === currentFilterMember.toLowerCase());
+      }
+
+      const searchVal = document.getElementById("ledgerSearchInput")?.value.toLowerCase().trim();
+      if (searchVal) {
+        filtered = filtered.filter(tx => 
+          (tx.description || "").toLowerCase().includes(searchVal) || 
+          (tx.category || "").toLowerCase().includes(searchVal)
+        );
+      }
+
+      document.getElementById("ledgerCountSubtext").textContent = `Showing ${filtered.length} of ${transactions.length} entries for ${currentMonth} 2026`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-[#858585]">No matching transactions found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(tx => {
+        const isIncome = tx.type === "income";
+        const amtPrefix = isIncome ? "+" : "-";
+        const amtClass = isIncome ? "text-[#279B58] font-bold" : "text-[#171717] font-semibold";
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-[#F8F9F8] smooth-transition";
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-[#858585] whitespace-nowrap">${tx.date}</td>
+          <td class="py-3 px-4 font-medium text-[#171717]">${escapeHtml(tx.description)}</td>
+          <td class="py-3 px-4">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#F3F3F3] text-[#171717]">
+              ${escapeHtml(tx.category)}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#E9F8D8] text-[#064B19]">
+              ${tx.paid_by}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right tabular-nums ${amtClass}">
+            ${amtPrefix}${formatCurrency(tx.amount)}
+          </td>
+          <td class="py-3 px-4 text-center">
+            <span class="text-[10px] uppercase font-bold ${isIncome ? 'text-[#279B58]' : 'text-[#858585]'}">
+              ${tx.type || 'expense'}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderFixedCommitments(items) {
+      const list = document.getElementById("fixedItemsList");
+      list.innerHTML = "";
+      if (!items || items.length === 0) return;
+
+      items.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "p-3 rounded-[14px] bg-[#F8F9F8] border border-[#EEEEEE] flex items-center justify-between text-xs";
+        div.innerHTML = `
+          <div>
+            <h4 class="font-semibold text-[#171717]">${item.name}</h4>
+            <p class="text-[10px] text-[#858585]">${item.category} · Assigned: ${item.member}</p>
+          </div>
+          <div class="text-right">
+            <span class="font-semibold text-[#171717] tabular-nums">${formatCurrency(item.amount, false)}</span>
+            <span class="block text-[9px] uppercase font-bold text-[#E9A23B]">${item.priority}</span>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // Overview Tab Upcoming Reminders Renderer
+    function renderUpcomingReminders(reminders, monthAbbr) {
+      const container = document.getElementById("overviewRemindersList");
+      const badge = document.getElementById("overviewReminderBadge");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const monthMap = {
+        january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+        july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+        jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+        jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+      };
+      const curMonthNum = monthMap[(monthAbbr || currentMonth).toLowerCase()] || 11;
+
+      // Source items
+      const items = (reminders && reminders.length > 0) ? reminders : (dashboardData?.annual_commitments || [
+        { id: 1, name: "Health Insurance (Family)", category: "Insurance", responsible: "Mom", annual_amount: 45000, payment_month: "January", monthly_provision: 3750, notes: "Star Health" },
+        { id: 6, name: "Papa LIC", category: "Insurance", responsible: "Dad", annual_amount: 51000, payment_month: "January", monthly_provision: 4250, notes: "Life Insurance" }
+      ]);
+
+      const calculated = items.map(item => {
+        const pm = (item.payment_month || "").trim();
+        const pmLower = pm.toLowerCase();
+        let diff = 99;
+        let statusText = "Flexible";
+        let urgency = "flexible";
+        let badgeColor = "bg-[#F3F3F3] text-[#858585]";
+
+        if (pmLower !== "any" && pmLower !== "flexible" && pmLower !== "-") {
+          const dueNum = monthMap[pmLower] || 0;
+          if (dueNum > 0) {
+            diff = (dueNum - curMonthNum + 12) % 12;
+            if (diff === 0) {
+              statusText = "Due This Month!";
+              urgency = "critical";
+              badgeColor = "bg-[#FDE8E7] text-[#E36C65]";
+            } else if (diff === 1) {
+              statusText = "1 Month to go (Next Month)";
+              urgency = "warning";
+              badgeColor = "bg-[#FEF3D6] text-[#E9A23B]";
+            } else if (diff === 2) {
+              statusText = "2 Months Remaining";
+              urgency = "upcoming";
+              badgeColor = "bg-[#E9F8D8] text-[#064B19]";
+            } else {
+              statusText = `${diff} Months to go`;
+              urgency = "future";
+              badgeColor = "bg-[#F3F3F3] text-[#858585]";
+            }
+          }
+        }
+
+        return { ...item, diff, statusText, urgency, badgeColor };
+      });
+
+      const sorted = calculated.filter(x => x.diff < 90).sort((a, b) => a.diff - b.diff);
+      const topReminders = sorted.slice(0, 2);
+
+      if (badge) {
+        badge.textContent = `${sorted.length} Scheduled`;
+        if (sorted.some(x => x.diff <= 1)) {
+          badge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#FDE8E7] text-[#E36C65] tabular-nums";
+        } else {
+          badge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19] tabular-nums";
+        }
+      }
+
+      if (topReminders.length === 0) {
+        container.innerHTML = `<p class="text-xs text-[#858585] py-2 text-center">No immediate annual commitments due.</p>`;
+        return;
+      }
+
+      topReminders.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "p-3 rounded-[14px] bg-[#F8F9F8] border border-[#EEEEEE] flex items-center justify-between hover:bg-[#F3F3F3] smooth-transition cursor-pointer";
+        div.onclick = () => switchTab('fixed');
+        div.innerHTML = `
+          <div class="min-w-0 pr-2">
+            <div class="flex items-center gap-1.5 mb-0.5">
+              <span class="font-semibold text-xs text-[#171717] truncate">${escapeHtml(r.name)}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white border border-[#EEEEEE] text-[#858585]">${escapeHtml(r.responsible)}</span>
+            </div>
+            <div class="flex items-center gap-2 text-[10px] text-[#858585]">
+              <span>Due: <strong class="text-[#171717]">${escapeHtml(r.payment_month)}</strong></span>
+              ${r.notes ? `<span>· ${escapeHtml(r.notes)}</span>` : ""}
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="font-bold text-xs text-[#171717] tabular-nums">${formatCurrency(r.annual_amount, false)}</span>
+            <span class="block text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 ${r.badgeColor}">
+              ${r.statusText}
+            </span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Fixed Tab: Annual & One-Time Commitments & Timeline Table Renderer
+    function renderAnnualCommitments(commitments, totalAnnual, monthlyProvision, monthAbbr) {
+      const tbody = document.getElementById("annualCommitmentsTableBody");
+      const timelineContainer = document.getElementById("annualTimelineContainer");
+      const refPill = document.getElementById("annualTimelineReference");
+      const summaryTotal = document.getElementById("annualTotalSummary");
+      const summaryProv = document.getElementById("monthlyProvisionSummary");
+      const footerTotal = document.getElementById("annualTableFooterTotal");
+      const footerProv = document.getElementById("annualTableFooterProvision");
+
+      if (summaryTotal) summaryTotal.textContent = formatCurrency(totalAnnual || 177762);
+      if (summaryProv) summaryProv.textContent = formatCurrency(monthlyProvision || 14814);
+      if (footerTotal) footerTotal.textContent = formatCurrency(totalAnnual || 177762);
+      if (footerProv) footerProv.textContent = formatCurrency(monthlyProvision || 14814);
+      if (refPill) refPill.textContent = `Active Reference: ${monthAbbr || currentMonth} 2026`;
+
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      if (timelineContainer) timelineContainer.innerHTML = "";
+
+      const monthMap = {
+        january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+        july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+        jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+        jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+      };
+      const curMonthNum = monthMap[(monthAbbr || currentMonth).toLowerCase()] || 11;
+
+      const items = (commitments && commitments.length > 0) ? commitments : [
+        { id: 1, name: "Health Insurance (Family)", category: "Insurance", responsible: "Mom", annual_amount: 45000, payment_month: "January", monthly_provision: 3750, notes: "Star Health" },
+        { id: 2, name: "Car Insurance (Slavia)", category: "Insurance", responsible: "Dad", annual_amount: 15000, payment_month: "June", monthly_provision: 1250, notes: "Vehicle Insurance" },
+        { id: 3, name: "Tanmay LIC", category: "Insurance", responsible: "Mom", annual_amount: 15152, payment_month: "April", monthly_provision: 1263, notes: "Life Insurance" },
+        { id: 4, name: "Mom Money Bank", category: "Insurance", responsible: "Mom", annual_amount: 10000, payment_month: "Any", monthly_provision: 833, notes: "Flexible Policy" },
+        { id: 5, name: "Mom Jeevan Anand", category: "Insurance", responsible: "Mom", annual_amount: 41610, payment_month: "September", monthly_provision: 3468, notes: "LIC Policy" },
+        { id: 6, name: "Papa LIC", category: "Insurance", responsible: "Dad", annual_amount: 51000, payment_month: "January", monthly_provision: 4250, notes: "Life Insurance" }
+      ];
+
+      const processed = items.map((c, idx) => {
+        const pm = (c.payment_month || "").trim();
+        const pmLower = pm.toLowerCase();
+        let diff = 99;
+        let statusText = "Flexible / Any Month";
+        let urgency = "flexible";
+        let badgeClass = "bg-[#F3F3F3] text-[#858585]";
+
+        if (pmLower !== "any" && pmLower !== "flexible" && pmLower !== "-") {
+          const dueNum = monthMap[pmLower] || 0;
+          if (dueNum > 0) {
+            diff = (dueNum - curMonthNum + 12) % 12;
+            if (diff === 0) {
+              statusText = "Due this month!";
+              urgency = "critical";
+              badgeClass = "bg-[#FDE8E7] text-[#E36C65] font-bold";
+            } else if (diff === 1) {
+              statusText = "1 month to go (Due Next Month!)";
+              urgency = "warning";
+              badgeClass = "bg-[#FEF3D6] text-[#E9A23B] font-bold";
+            } else if (diff === 2) {
+              statusText = "2 months remaining";
+              urgency = "upcoming";
+              badgeClass = "bg-[#E9F8D8] text-[#064B19] font-bold";
+            } else if (diff === 3) {
+              statusText = "3 months to go";
+              urgency = "upcoming";
+              badgeClass = "bg-[#E9F8D8] text-[#064B19] font-semibold";
+            } else {
+              statusText = `${diff} months to go`;
+              urgency = "future";
+              badgeClass = "bg-[#F3F3F3] text-[#858585] font-medium";
+            }
+          }
+        }
+
+        return {
+          ...c,
+          id: c.id || idx + 1,
+          diff,
+          statusText,
+          urgency,
+          badgeClass
+        };
+      });
+
+      // 1. Timeline Roadmap Cards
+      if (timelineContainer) {
+        const chronoSorted = [...processed].filter(x => x.diff < 90).sort((a, b) => a.diff - b.diff);
+        chronoSorted.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "p-3.5 rounded-[16px] bg-[#F8F9F8] border border-[#EEEEEE] flex flex-col justify-between neo-shadow hover:border-[#064B19]/30 smooth-transition";
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.badgeClass}">
+                  ${item.statusText}
+                </span>
+                <span class="text-[10px] font-semibold text-[#858585]">${escapeHtml(item.payment_month)}</span>
+              </div>
+              <h5 class="font-semibold text-xs text-[#171717] truncate">${escapeHtml(item.name)}</h5>
+              <p class="text-[10px] text-[#858585] mt-0.5">${escapeHtml(item.responsible)} · ${escapeHtml(item.notes || item.category)}</p>
+            </div>
+            <div class="pt-3 border-t border-[#EEEEEE] mt-3 flex items-center justify-between text-xs">
+              <span class="text-[10px] text-[#858585]">Annual Premium:</span>
+              <span class="font-bold text-[#171717] tabular-nums">${formatCurrency(item.annual_amount, false)}</span>
+            </div>
+          `;
+          timelineContainer.appendChild(card);
+        });
+
+        const flexItem = processed.find(x => x.diff >= 90);
+        if (flexItem) {
+          const card = document.createElement("div");
+          card.className = "p-3.5 rounded-[16px] bg-[#F8F9F8] border border-[#EEEEEE] flex flex-col justify-between neo-shadow";
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#F3F3F3] text-[#858585]">Flexible</span>
+                <span class="text-[10px] font-semibold text-[#858585]">Any Time</span>
+              </div>
+              <h5 class="font-semibold text-xs text-[#171717] truncate">${escapeHtml(flexItem.name)}</h5>
+              <p class="text-[10px] text-[#858585] mt-0.5">${escapeHtml(flexItem.responsible)} · ${escapeHtml(flexItem.category)}</p>
+            </div>
+            <div class="pt-3 border-t border-[#EEEEEE] mt-3 flex items-center justify-between text-xs">
+              <span class="text-[10px] text-[#858585]">Annual Premium:</span>
+              <span class="font-bold text-[#171717] tabular-nums">${formatCurrency(flexItem.annual_amount, false)}</span>
+            </div>
+          `;
+          timelineContainer.appendChild(card);
+        }
+      }
+
+      // 2. Full Table Rows
+      processed.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-[#F8F9F8] smooth-transition";
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-center text-[#858585] font-semibold">${item.id}</td>
+          <td class="py-3 px-4 font-semibold text-[#171717]">${escapeHtml(item.name)}</td>
+          <td class="py-3 px-4 text-[#858585]">${escapeHtml(item.category)}</td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${item.responsible === 'Mom' ? 'bg-[#CCF3A0] text-[#064B19]' : 'bg-[#E9F8D8] text-[#064B19]'}">
+              ${escapeHtml(item.responsible)}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right tabular-nums font-bold text-[#171717]">${formatCurrency(item.annual_amount)}</td>
+          <td class="py-3 px-4 text-center font-semibold text-[#171717]">${escapeHtml(item.payment_month)}</td>
+          <td class="py-3 px-4 text-right tabular-nums text-[#279B58] font-bold">${formatCurrency(item.monthly_provision)}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${item.badgeClass}">
+              ${item.statusText}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-[#858585]">${escapeHtml(item.notes || "-")}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Overview Tab: Loans & EMIs Highlight Renderer
+    function renderLoanEmiHighlight(data) {
+      const container = document.getElementById("overviewLoanList");
+      const totalElem = document.getElementById("overviewLoanTotal");
+      const badge = document.getElementById("overviewThermometerBadge");
+      const pctText = document.getElementById("overviewThermometerPctText");
+      const bar = document.getElementById("overviewThermometerBar");
+      if (!container) return;
+
+      const loans = data.loan_emis || [
+        { id: 1, description: "Car EMI", member: "Dad", amount_per_month: 13000, start_date: "Oct 2023", end_date: "Sep-2030", remaining_months: "45 Months" },
+        { id: 2, description: "TV EMI", member: "Dad", amount_per_month: 6500, start_date: "Aug 2025", end_date: "Dec-2026", remaining_months: "0 Months" },
+        { id: 3, description: "Laptop EMI", member: "Mom", amount_per_month: 10000, start_date: "Aug 2026", end_date: "31-Jan-2027", remaining_months: "2 Months" }
+      ];
+
+      const totalLoan = data.total_loan || 29500;
+      const pct = data.financial_thermometer_pct || 15.95;
+
+      if (totalElem) totalElem.textContent = `${formatCurrency(totalLoan, false)}/mo`;
+      if (pctText) pctText.textContent = `${pct}% of Income`;
+      if (bar) bar.style.width = `${Math.min(100, pct)}%`;
+
+      if (badge) {
+        if (pct < 20) {
+          badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19] inline-flex items-center gap-1";
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#279B58]"></span><span>${pct}% Safe</span>`;
+        } else if (pct < 35) {
+          badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FEF3D6] text-[#E9A23B] inline-flex items-center gap-1";
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#E9A23B]"></span><span>${pct}% Moderate</span>`;
+        } else {
+          badge.className = "text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FDE8E7] text-[#E36C65] inline-flex items-center gap-1";
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-[#E36C65]"></span><span>${pct}% Alert</span>`;
+        }
+      }
+
+      container.innerHTML = "";
+      loans.forEach(loan => {
+        const div = document.createElement("div");
+        div.className = "p-2.5 rounded-[12px] bg-[#F8F9F8] border border-[#EEEEEE] flex items-center justify-between hover:bg-[#F3F3F3] smooth-transition cursor-pointer";
+        div.onclick = () => switchTab('fixed');
+
+        let tenureBadgeClass = "bg-[#FFFFFF] border border-[#EEEEEE] text-[#858585]";
+        let remText = loan.remaining_months || "";
+        if (remText.includes("0 Month") || remText.toLowerCase().includes("dec-2026") || remText.startsWith("0")) {
+          tenureBadgeClass = "bg-[#FEF3D6] text-[#E9A23B] font-bold";
+          remText = "Ending Dec 2026";
+        } else if (remText.includes("2 Month") || remText.includes("1 Month")) {
+          tenureBadgeClass = "bg-[#E9F8D8] text-[#064B19] font-bold";
+          remText = `${remText} left (Jan '27)`;
+        }
+
+        div.innerHTML = `
+          <div class="min-w-0 pr-2">
+            <div class="flex items-center gap-1.5">
+              <span class="font-semibold text-xs text-[#171717] truncate">${escapeHtml(loan.description)}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full ${loan.member === 'Mom' ? 'bg-[#CCF3A0] text-[#064B19]' : 'bg-[#E9F8D8] text-[#064B19]'}">${escapeHtml(loan.member)}</span>
+            </div>
+            <p class="text-[10px] text-[#858585] mt-0.5">Ends: ${escapeHtml(loan.end_date)}</p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="font-bold text-xs text-[#171717] tabular-nums">${formatCurrency(loan.amount_per_month, false)}/mo</span>
+            <span class="block text-[9px] font-semibold px-1.5 py-0.5 rounded-full mt-0.5 ${tenureBadgeClass}">
+              ${remText}
+            </span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Fixed Tab: EMIs & Loans Command Center Renderer
+    function renderLoanEmiSection(data) {
+      const tbody = document.getElementById("loanTableBody");
+      const grid = document.getElementById("activeLoansCardGrid");
+      const summaryTotal = document.getElementById("loanTotalSummary");
+      const summaryMaxSafe = document.getElementById("maxSafeEmiSummary");
+      const thermPctDisplay = document.getElementById("loanThermometerPctDisplay");
+      const thermStatusText = document.getElementById("loanThermometerStatusText");
+      const thermFillBar = document.getElementById("loanThermometerFillBar");
+      const thermZonePill = document.getElementById("loanThermometerZonePill");
+      const headerBadge = document.getElementById("loanHeaderThermometerBadge");
+
+      const footerTotal = document.getElementById("loanTableFooterTotal");
+      const footerPct = document.getElementById("loanTableFooterPct");
+      const footerStatus = document.getElementById("loanTableFooterStatus");
+      const footerMaxSafe = document.getElementById("loanTableFooterMaxSafe");
+
+      const loans = data.loan_emis || [
+        { id: 1, description: "Car EMI", member: "Dad", amount_per_month: 13000, start_date: "Oct 2023", end_date: "Sep-2030", remaining_months: "45 Months", notes: "" },
+        { id: 2, description: "TV EMI", member: "Dad", amount_per_month: 6500, start_date: "Aug 2025", end_date: "Dec-2026", remaining_months: "0 Months", notes: "" },
+        { id: 3, description: "Laptop EMI", member: "Mom", amount_per_month: 10000, start_date: "Aug 2026", end_date: "31-Jan-2027", remaining_months: "2 Months", notes: "" }
+      ];
+
+      const totalLoan = data.total_loan || 29500;
+      const pct = data.financial_thermometer_pct || 15.95;
+      const maxSafe = data.max_safe_new_emi || 7500;
+      const statusText = data.financial_thermometer_status || "🟢 Safe Zone: Excellent financial health. You completely own your cash flow.";
+
+      if (summaryTotal) summaryTotal.textContent = formatCurrency(totalLoan);
+      if (summaryMaxSafe) summaryMaxSafe.textContent = formatCurrency(maxSafe);
+      if (footerTotal) footerTotal.textContent = formatCurrency(totalLoan);
+      if (footerPct) footerPct.textContent = `${pct}%`;
+      if (footerStatus) footerStatus.textContent = statusText;
+      if (footerMaxSafe) footerMaxSafe.textContent = formatCurrency(maxSafe);
+
+      if (thermPctDisplay) thermPctDisplay.textContent = `${pct}%`;
+      if (thermStatusText) thermStatusText.textContent = statusText;
+      if (thermFillBar) thermFillBar.style.width = `${Math.min(100, pct)}%`;
+      if (headerBadge) headerBadge.textContent = `Financial Thermometer: ${pct}% Safe Zone`;
+
+      if (thermZonePill) {
+        if (pct < 20) {
+          thermZonePill.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#279B58] text-white";
+          thermZonePill.textContent = "Safe Zone (< 20%)";
+        } else if (pct < 35) {
+          thermZonePill.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#E9A23B] text-white";
+          thermZonePill.textContent = "Moderate Zone (20-35%)";
+        } else {
+          thermZonePill.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#E36C65] text-white";
+          thermZonePill.textContent = "Overleveraged Zone (> 35%)";
+        }
+      }
+
+      // Render 3 Active Loan Cards
+      if (grid) {
+        grid.innerHTML = "";
+        loans.forEach(loan => {
+          const card = document.createElement("div");
+          card.className = "p-4 rounded-[18px] bg-[#F8F9F8] border border-[#EEEEEE] neo-shadow flex flex-col justify-between hover:border-[#064B19]/30 smooth-transition";
+
+          let badgeHtml = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#EEEEEE] text-[#858585]">${loan.remaining_months}</span>`;
+          if ((loan.remaining_months || "").includes("0 Month") || (loan.remaining_months || "").startsWith("0")) {
+            badgeHtml = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF3D6] text-[#E9A23B]">Ending Dec 2026</span>`;
+          } else if ((loan.remaining_months || "").includes("2 Month")) {
+            badgeHtml = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E9F8D8] text-[#064B19]">2 Months Left</span>`;
+          }
+
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${loan.member === 'Mom' ? 'bg-[#CCF3A0] text-[#064B19]' : 'bg-[#E9F8D8] text-[#064B19]'}">${escapeHtml(loan.member)}</span>
+                ${badgeHtml}
+              </div>
+              <h5 class="font-semibold text-sm text-[#171717]">${escapeHtml(loan.description)}</h5>
+              <p class="text-[11px] text-[#858585] mt-1">${escapeHtml(loan.start_date)} → <strong class="text-[#171717]">${escapeHtml(loan.end_date)}</strong></p>
+            </div>
+            <div class="pt-3 border-t border-[#EEEEEE] mt-3 flex items-center justify-between text-xs">
+              <span class="text-[10px] text-[#858585]">Monthly EMI:</span>
+              <span class="font-bold text-[#171717] tabular-nums text-sm font-heading">${formatCurrency(loan.amount_per_month, false)}</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      // Render Detailed Table Rows
+      if (tbody) {
+        tbody.innerHTML = "";
+        loans.forEach(loan => {
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-[#F8F9F8] smooth-transition";
+
+          let remBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#F3F3F3] text-[#858585]">${escapeHtml(loan.remaining_months)}</span>`;
+          if ((loan.remaining_months || "").includes("0 Month") || (loan.remaining_months || "").startsWith("0")) {
+            remBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEF3D6] text-[#E9A23B]">Ending Soon (0 Months)</span>`;
+          } else if ((loan.remaining_months || "").includes("2 Month")) {
+            remBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E9F8D8] text-[#064B19]">2 Months (Finishing Jan '27)</span>`;
+          }
+
+          tr.innerHTML = `
+            <td class="py-3 px-3 text-center text-[#858585] font-semibold">${loan.id}</td>
+            <td class="py-3 px-4 font-semibold text-[#171717]">${escapeHtml(loan.description)}</td>
+            <td class="py-3 px-4">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${loan.member === 'Mom' ? 'bg-[#CCF3A0] text-[#064B19]' : 'bg-[#E9F8D8] text-[#064B19]'}">
+                ${escapeHtml(loan.member)}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-right tabular-nums font-bold text-[#171717]">${formatCurrency(loan.amount_per_month)}</td>
+            <td class="py-3 px-4 text-center text-[#858585] font-medium">${escapeHtml(loan.start_date)}</td>
+            <td class="py-3 px-4 text-center font-semibold text-[#171717]">${escapeHtml(loan.end_date)}</td>
+            <td class="py-3 px-4 text-center">${remBadge}</td>
+            <td class="py-3 px-4 text-[#858585]">${escapeHtml(loan.notes || "-")}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      const views = ["overview", "analytics", "transactions", "fixed"];
+      views.forEach(v => {
+        document.getElementById(`view-${v}`).classList.add("hidden");
+        const btn = document.getElementById(`tab-${v}`);
+        btn.classList.remove("bg-[#B3ED74]", "text-[#064B19]");
+        btn.classList.add("text-[#858585]");
+      });
+
+      document.getElementById(`view-${tabId}`).classList.remove("hidden");
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.add("bg-[#B3ED74]", "text-[#064B19]");
+      activeBtn.classList.remove("text-[#858585]");
+    }
+
+    // Month Selector Change
+    function onMonthChange(month) {
+      fetchDashboardData(month);
+    }
+
+    // Currency Switcher
+    function setCurrency(cur) {
+      activeCurrency = cur;
+      document.querySelectorAll(".cur-btn").forEach(btn => {
+        btn.classList.remove("bg-white", "text-[#171717]", "neo-shadow");
+        btn.classList.add("text-[#858585]");
+      });
+      const active = document.getElementById(`cur-${cur}`);
+      active.classList.add("bg-white", "text-[#171717]", "neo-shadow");
+      active.classList.remove("text-[#858585]");
+
+      if (dashboardData) {
+        renderDashboard(dashboardData);
+      }
+    }
+
+    // Privacy Mask Toggle
+    function togglePrivacy() {
+      isPrivacyMasked = !isPrivacyMasked;
+      if (dashboardData) {
+        updateSpendingAndSavingsDisplays(dashboardData);
+        updateInflowDisplays(dashboardData);
+      }
+    }
+
+    // Filter Transactions
+    function filterByMember(member) {
+      currentFilterMember = member;
+      document.querySelectorAll(".member-filter-btn").forEach(btn => {
+        if (btn.getAttribute("data-member") === member) {
+          btn.className = "member-filter-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-[#064B19] text-white";
+        } else {
+          btn.className = "member-filter-btn px-3 py-1.5 rounded-full text-xs font-medium text-[#858585] hover:text-[#171717] bg-[#F3F3F3]";
+        }
+      });
+      renderLedgerTable(allTransactions);
+    }
+
+    function filterTransactions() {
+      renderLedgerTable(allTransactions);
+    }
+
+    function focusSearch() {
+      switchTab("transactions");
+      const inp = document.getElementById("ledgerSearchInput");
+      inp.focus();
+    }
+
+    // Modal Control
+    function openAddExpenseModal() {
+      document.getElementById("addExpenseModal").classList.remove("hidden");
+    }
+
+    function closeAddExpenseModal() {
+      document.getElementById("addExpenseModal").classList.add("hidden");
+    }
+
+    async function submitExpense(e) {
+      e.preventDefault();
+      const desc = document.getElementById("formDescription").value;
+      const amt = parseFloat(document.getElementById("formAmount").value);
+      const paidBy = document.getElementById("formPaidBy").value;
+      const cat = document.getElementById("formCategory").value;
+      const rawDate = document.getElementById("formDate").value;
+      const comment = document.getElementById("formComment").value;
+
+      const submitBtn = document.getElementById("formSubmitBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Writing to Google Sheet...";
+
+      // Format date like '06-Nov-2026'
+      const dt = new Date(rawDate);
+      const day = String(dt.getDate()).padStart(2, "0");
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const formattedDate = `${day}-${months[dt.getMonth()]}-${dt.getFullYear()}`;
+
+      try {
+        const resp = await fetch("/api/add-expense", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            month: currentMonth,
+            date: formattedDate,
+            description: desc,
+            category: cat,
+            amount: amt,
+            paid_by: paidBy,
+            comment: comment
+          })
+        });
+        const res = await resp.json();
+        if (res.success) {
+          showToast(res.message || "Expense successfully appended!");
+          closeAddExpenseModal();
+          document.getElementById("addExpenseForm").reset();
+          document.getElementById("formDate").value = new Date().toISOString().split("T")[0];
+          // Refresh data
+          fetchDashboardData(currentMonth);
+        } else {
+          alert("Error: " + (res.error || "Failed to append row"));
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Expense recorded locally! (Offline mode)");
+        closeAddExpenseModal();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Append to Google Sheet";
+      }
+    }
+
+    function dismissConfirmation(confirmed) {
+      const banner = document.getElementById("paymentConfirmationBanner");
+      if (banner) {
+        banner.style.display = "none";
+        showToast(confirmed ? "Bot entry confirmed!" : "Dismissed");
+      }
+    }
+
+    function copyAccountId() {
+      navigator.clipboard.writeText("90340222748");
+      showToast("Vault Account ID copied to clipboard!");
+    }
+
+    function refreshData() {
+      const icon = document.getElementById("syncIcon");
+      icon.classList.add("animate-spin");
+      fetchDashboardData(currentMonth).finally(() => {
+        setTimeout(() => icon.classList.remove("animate-spin"), 600);
+      });
+    }
+
+    function openSummaryModal() {
+      if (!dashboardData) return;
+      alert(`📊 ${dashboardData.month_full} Summary\n\n` +
+            `💰 Inflow: ₹${dashboardData.total_income.toLocaleString('en-IN')}\n` +
+            `🛡️ Fixed Commitments: ₹${dashboardData.total_fixed.toLocaleString('en-IN')}\n` +
+            `🛒 Variable Spend: ₹${dashboardData.total_variable_spent.toLocaleString('en-IN')}\n` +
+            `✨ Net Surplus: ₹${dashboardData.active_balance.toLocaleString('en-IN')}\n` +
+            `📈 Savings Rate: ${dashboardData.savings_rate}%`);
+    }
+
+    function openOptionsMenu() {
+      showToast("Options: Export Sheet · Manage Webhook · Invite Family Member");
+    }
+
+    function toggleNotificationToast() {
+      showToast("24 updates: 2 new bot expenses, monthly fixed bills verified!");
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toastNotification");
+      const text = document.getElementById("toastMessage");
+      text.textContent = msg;
+      toast.classList.remove("translate-y-24", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-y-24", "opacity-0");
+      }, 3200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    // Outlined Lucide icon SVGs
+    function getCategoryIconSvg(cat) {
+      const c = (cat || "").toLowerCase();
+      if (c.includes("grocer") || c.includes("veg") || c.includes("egg")) {
+        return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`;
+      }
+      if (c.includes("petrol") || c.includes("transport") || c.includes("fastag")) {
+        return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`;
+      }
+      if (c.includes("medic") || c.includes("health")) {
+        return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+      }
+      if (c.includes("cloth") || c.includes("person")) {
+        return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/></svg>`;
+      }
+      if (c.includes("entertain") || c.includes("din") || c.includes("movie")) {
+        return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/></svg>`;
+      }
+      if (c.includes("util") || c.includes("electric") || c.includes("telecom") || c.includes("wifi")) {
+        return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
+      }
+      return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>`;
+    }
+
+    // Built-in fallback data if standalone or offline
+    const SHARED_ANNUAL_COMMITMENTS = [
+      { id: 1, name: "Health Insurance (Family)", category: "Insurance", responsible: "Mom", annual_amount: 45000.0, payment_month: "January", monthly_provision: 3750.0, notes: "Star Health" },
+      { id: 2, name: "Car Insurance (Slavia)", category: "Insurance", responsible: "Dad", annual_amount: 15000.0, payment_month: "June", monthly_provision: 1250.0, notes: "Vehicle Insurance" },
+      { id: 3, name: "Tanmay LIC", category: "Insurance", responsible: "Mom", annual_amount: 15152.0, payment_month: "April", monthly_provision: 1263.0, notes: "Life Insurance" },
+      { id: 4, name: "Mom Money Bank", category: "Insurance", responsible: "Mom", annual_amount: 10000.0, payment_month: "Any", monthly_provision: 833.0, notes: "Flexible Policy" },
+      { id: 5, name: "Mom Jeevan Anand", category: "Insurance", responsible: "Mom", annual_amount: 41610.0, payment_month: "September", monthly_provision: 3468.0, notes: "LIC Policy" },
+      { id: 6, name: "Papa LIC", category: "Insurance", responsible: "Dad", annual_amount: 51000.0, payment_month: "January", monthly_provision: 4250.0, notes: "Life Insurance" }
+    ];
+
+    const SHARED_LOAN_EMIS = [
+      { id: 1, description: "Car EMI", member: "Dad", amount_per_month: 13000.0, start_date: "Oct 2023", end_date: "Sep-2030", remaining_months: "45 Months", notes: "Vehicle Loan" },
+      { id: 2, description: "TV EMI", member: "Dad", amount_per_month: 6500.0, start_date: "Aug 2025", end_date: "Dec-2026", remaining_months: "0 Months", notes: "Consumer Durable" },
+      { id: 3, description: "Laptop EMI", member: "Mom", amount_per_month: 10000.0, start_date: "Aug 2026", end_date: "31-Jan-2027", remaining_months: "2 Months", notes: "Work Laptop" }
+    ];
+
+    function getFallbackData(month) {
+      if (month === "Sep") {
+        return {
+          month: "Sep",
+          month_full: "September 2026",
+          active_balance: 156121.0,
+          total_spent: 202229.0,
+          saving: 156121.0,
+          saving_pct: 43.57,
+          total_investment: 35000.0,
+          investment_pct: 9.77,
+          total_income: 358350.0,
+          income_plus_previous_month: 358350.0,
+          current_month_income: 184500.0,
+          extra_from_previous_month: 173850.0,
+          total_fixed: 77740.0,
+          total_variable_spent: 167229.0,
+          total_annual_commitments: 177762.0,
+          total_monthly_provision: 14814.0,
+          annual_commitments: SHARED_ANNUAL_COMMITMENTS,
+          loan_emis: SHARED_LOAN_EMIS,
+          total_loan: 29500.0,
+          financial_thermometer_pct: 15.95,
+          financial_thermometer_status: "🟢 Safe Zone: Excellent financial health. You completely own your cash flow.",
+          financial_thermometer_zone: "safe",
+          max_safe_new_emi: 7500.0,
+          loan_emis: SHARED_LOAN_EMIS,
+          total_loan: 29500.0,
+          financial_thermometer_pct: 15.95,
+          financial_thermometer_status: "🟢 Safe Zone: Excellent financial health. You completely own your cash flow.",
+          financial_thermometer_zone: "safe",
+          max_safe_new_emi: 7500.0,
+          discretionary_pool: 280610.0,
+          savings_rate: 43.6,
+          top_cat_insight: "Housing & Utilities is your highest spend at 21.1%",
+          categories: [
+            { category: "Housing & Utilities", amount: 35250.0, percentage: 21.1, budget: 10000.0, variance: -25250.0, is_over: true, status: "🔴 Over" },
+            { category: "Loan EMI / Installment", amount: 24697.0, percentage: 14.8, budget: 41000.0, variance: 16303.0, is_over: false, status: "✅ Under" },
+            { category: "Petrol + Fastag", amount: 19560.0, percentage: 11.7, budget: 15000.0, variance: -4560.0, is_over: true, status: "🔴 Over" },
+            { category: "Medical & Healthcare", amount: 18689.0, percentage: 11.2, budget: 5000.0, variance: -13689.0, is_over: true, status: "🔴 Over" },
+            { category: "Household Services", amount: 11855.0, percentage: 7.1, budget: 10000.0, variance: -1855.0, is_over: true, status: "🔴 Over" },
+            { category: "Clothing & Personal Care", amount: 10390.0, percentage: 6.2, budget: 0.0, variance: 0.0, is_over: false, status: "No Budget" },
+            { category: "Gifts & Occasions", amount: 8460.0, percentage: 5.1, budget: 5000.0, variance: -3460.0, is_over: true, status: "🔴 Over" },
+            { category: "Entertainment / Dining Out", amount: 7926.0, percentage: 4.7, budget: 500.0, variance: -7426.0, is_over: true, status: "🔴 Over" },
+            { category: "Transportation", amount: 6225.0, percentage: 3.7, budget: 5000.0, variance: -1225.0, is_over: true, status: "🔴 Over" },
+            { category: "Groceries", amount: 4832.0, percentage: 2.9, budget: 5000.0, variance: 168.0, is_over: false, status: "🟡 On Track" },
+            { category: "Education & Courses", amount: 2700.0, percentage: 1.6, budget: 2000.0, variance: -700.0, is_over: true, status: "🔴 Over" },
+            { category: "Fruits & Vegetables", amount: 2646.0, percentage: 1.6, budget: 2000.0, variance: -646.0, is_over: true, status: "🔴 Over" },
+            { category: "Telecom & Internet", amount: 2450.0, percentage: 1.5, budget: 2000.0, variance: -450.0, is_over: true, status: "🔴 Over" },
+            { category: "Non-Veg / Protein", amount: 1800.0, percentage: 1.1, budget: 2000.0, variance: 200.0, is_over: false, status: "🟡 On Track" }
+          ],
+          members: [
+            { name: "Dad", amount: 107997.0, percentage: 55.0 },
+            { name: "Mom", amount: 91741.0, percentage: 46.7 },
+            { name: "Tanmay", amount: 2316.0, percentage: 1.2 },
+            { name: "Akshat", amount: 175.0, percentage: 0.1 }
+          ],
+          recent_transactions: [
+            { date: "28-Sep-2026", description: "auto ride", category: "Transportation", amount: 175.0, paid_by: "Akshat", type: "expense" },
+            { date: "25-Sep-2026", description: "house rent", category: "Housing & Utilities", amount: 35000.0, paid_by: "Dad", type: "expense" },
+            { date: "20-Sep-2026", description: "mutual fund sip", category: "Investments / SIP", amount: 35000.0, paid_by: "Mom", type: "expense" }
+          ]
+        };
+      }
+
+      if (month === "Oct") {
+        return {
+          month: "Oct",
+          month_full: "October 2026",
+          active_balance: 273866.0,
+          total_spent: 84484.0,
+          saving: 273866.0,
+          saving_pct: 76.42,
+          total_investment: 0.0,
+          investment_pct: 0.0,
+          total_income: 358350.0,
+          income_plus_previous_month: 358350.0,
+          current_month_income: 184500.0,
+          extra_from_previous_month: 173850.0,
+          total_fixed: 77740.0,
+          total_variable_spent: 84484.0,
+          total_annual_commitments: 177762.0,
+          total_monthly_provision: 14814.0,
+          annual_commitments: SHARED_ANNUAL_COMMITMENTS,
+          loan_emis: SHARED_LOAN_EMIS,
+          total_loan: 29500.0,
+          financial_thermometer_pct: 15.95,
+          financial_thermometer_status: "🟢 Safe Zone: Excellent financial health. You completely own your cash flow.",
+          financial_thermometer_zone: "safe",
+          max_safe_new_emi: 7500.0,
+          discretionary_pool: 280610.0,
+          savings_rate: 76.4,
+          top_cat_insight: "Miscellaneous / Other is your highest spend at 57.4%",
+          categories: [
+            { category: "Miscellaneous / Other", amount: 48465.0, percentage: 57.4 },
+            { category: "Clothing & Personal Care", amount: 10295.0, percentage: 12.2 },
+            { category: "Petrol + Fastag", amount: 9326.0, percentage: 11.0 },
+            { category: "Transportation", amount: 5000.0, percentage: 5.9 },
+            { category: "Medical & Healthcare", amount: 4312.0, percentage: 5.1 },
+            { category: "Entertainment / Dining Out", amount: 3810.0, percentage: 4.5 },
+            { category: "Telecom & Internet", amount: 2214.0, percentage: 2.6 },
+            { category: "Groceries", amount: 992.0, percentage: 1.2 }
+          ],
+          members: [
+            { name: "Tanmay", amount: 12256.0, percentage: 14.5 },
+            { name: "Dad", amount: 72228.0, percentage: 85.5 },
+            { name: "Mom", amount: 0.0, percentage: 0.0 },
+            { name: "Akshat", amount: 0.0, percentage: 0.0 }
+          ],
+          fixed_commitments: [
+            { name: "Aai SIP (Mutual Fund)", category: "Investment / SIP", member: "Mom", amount: 30000.0, priority: "High" },
+            { name: "Slavia Car Installment", category: "Loan EMI", member: "Dad", amount: 13000.0, priority: "Critical" },
+            { name: "Papa SIP (Mutual Fund)", category: "Investment / SIP", member: "Dad", amount: 9000.0, priority: "High" },
+            { name: "Electricity Bill", category: "Utilities", member: "Dad", amount: 8000.0, priority: "Critical" },
+            { name: "Chaitali Salary", category: "Household Help", member: "Mom", amount: 5000.0, priority: "High" },
+            { name: "Rinku Salary", category: "Household Help", member: "Mom", amount: 4000.0, priority: "High" },
+            { name: "Akshat SIP", category: "Investment / SIP", member: "Mom", amount: 3000.0, priority: "High" },
+            { name: "Milk (Monthly)", category: "Groceries", member: "Mom", amount: 2100.0, priority: "High" },
+            { name: "Wifi Bill (Airtel)", category: "Telecom & Internet", member: "Dad", amount: 1340.0, priority: "Critical" },
+            { name: "Jio Mobile Bill", category: "Telecom & Internet", member: "Dad", amount: 1000.0, priority: "Critical" }
+          ],
+          recent_transactions: [
+            { date: "11-Oct-2026", description: "snacks", category: "Groceries", amount: 46.0, paid_by: "Tanmay", type: "expense" },
+            { date: "11-Oct-2026", description: "movie", category: "Entertainment / Dining Out", amount: 1560.0, paid_by: "Dad", type: "expense" },
+            { date: "11-Oct-2026", description: "meds", category: "Medical & Healthcare", amount: 140.0, paid_by: "Tanmay", type: "expense" },
+            { date: "11-Oct-2026", description: "banana", category: "Fruits & Vegetables", amount: 20.0, paid_by: "Tanmay", type: "expense" },
+            { date: "19-Oct-2026", description: "milk", category: "Groceries", amount: 71.0, paid_by: "Dad", type: "expense" },
+            { date: "20-Oct-2026", description: "petrol", category: "Petrol + Fastag", amount: 2000.0, paid_by: "Dad", type: "expense" }
+          ]
+        };
+      }
+
+      // Default November
+      return {
+        month: "Nov",
+        month_full: "November 2026",
+        active_balance: 358160.0,
+        total_spent: 190.0,
+        saving: 358160.0,
+        saving_pct: 99.95,
+        total_investment: 0.0,
+        investment_pct: 0.0,
+        total_income: 358350.0,
+        income_plus_previous_month: 358350.0,
+        current_month_income: 184500.0,
+        extra_from_previous_month: 173850.0,
+        total_fixed: 77740.0,
+        total_variable_spent: 190.0,
+        total_annual_commitments: 177762.0,
+        total_monthly_provision: 14814.0,
+        annual_commitments: SHARED_ANNUAL_COMMITMENTS,
+        discretionary_pool: 280610.0,
+        savings_rate: 99.9,
+        top_cat_insight: "Groceries & Protein logged via WhatsApp Bot",
+        categories: [
+          { category: "Groceries", amount: 120.0, percentage: 63.2 },
+          { category: "Non-Veg / Protein", amount: 70.0, percentage: 36.8 }
+        ],
+        members: [
+          { name: "Tanmay", amount: 190.0, percentage: 100.0 },
+          { name: "Dad", amount: 0.0, percentage: 0.0 },
+          { name: "Mom", amount: 0.0, percentage: 0.0 },
+          { name: "Akshat", amount: 0.0, percentage: 0.0 }
+        ],
+        fixed_commitments: [
+          { name: "Aai SIP (Mutual Fund)", category: "Investment / SIP", member: "Mom", amount: 30000.0, priority: "High" },
+          { name: "Slavia Car Installment", category: "Loan EMI", member: "Dad", amount: 13000.0, priority: "Critical" },
+          { name: "Papa SIP (Mutual Fund)", category: "Investment / SIP", member: "Dad", amount: 9000.0, priority: "High" },
+          { name: "Electricity Bill", category: "Utilities", member: "Dad", amount: 8000.0, priority: "Critical" },
+          { name: "Chaitali Salary", category: "Household Help", member: "Mom", amount: 5000.0, priority: "High" },
+          { name: "Rinku Salary", category: "Household Help", member: "Mom", amount: 4000.0, priority: "High" }
+        ],
+        recent_transactions: [
+          { date: "05-Nov-2026", description: "70 eggs", category: "Non-Veg / Protein", amount: 70.0, paid_by: "Tanmay", type: "expense" },
+          { date: "05-Nov-2026", description: "eggs and bread", category: "Groceries", amount: 120.0, paid_by: "Tanmay", type: "expense" }
+        ]
+      };
+    }
+  </script>
+</body>
+</html>

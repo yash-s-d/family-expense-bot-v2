@@ -294,6 +294,36 @@ By Family Member:
 
 ---
 
+## 💻 Modern Neo-Fintech Web Dashboard (2026)
+
+Beyond WhatsApp tracking, the bot features a **Neo-Fintech Web Dashboard** built with minimalist neobank aesthetics:
+
+* **Overview Command Center**:
+  * **Living Spend Hero**: Highlights total household spend (strictly excluding investments) with instant cards for **Monthly Savings** (with saving %) and **Investments** (with investment allocation %).
+  * **Inflow Breakdown**: Total Cash Inflow split into **Current Month Income** and **Extra From Previous Month**.
+  * **Category-Wise Spending Bar Graph**: Real-time spending against allocated category budgets, variance indicators (within budget vs over budget), and interactive hover tooltips.
+  * **Upcoming Annual Reminders**: Dynamic timeline countdown for annual commitments (e.g. Health Insurance, Car Insurance, LIC policies) calculating months remaining relative to any selected month.
+  * **Active Loans & EMIs Highlight**: Displays monthly debt obligations (₹29,500/mo), the **Financial Thermometer** debt-to-income gauge (15.95% Safe Zone), and new EMI safe headroom (+₹7,500).
+
+* **Analytics & Intelligence**: Member-wise spending distribution, top spend categories, cash available, and savings/investment rates.
+* **Fixed Commitments & Debt Command Center**:
+  * Full **Annual & One-Time Commitments** table with renewal timeline roadmap.
+  * Comprehensive **EMIs & Loans** table with payoff schedules, remaining tenure, and debt thermometer.
+* **Live Google Sheets Integration**: Two-way sync to log expenses, edit monthly settings, and inspect records.
+
+### Launching the Dashboard
+
+`ash
+# Start dashboard on port 5050
+python app_dashboard.py
+
+# Or run the Windows batch launcher
+run_dashboard.bat
+`
+Then open http://localhost:5050 in your browser.
+
+---
+
 ## 🤝 Contributing & Community
 
 Contributions are warmly welcome! If you'd like to add support for voice notes (speech-to-text), image bill scanning (OCR via Gemini Vision), or Telegram/Discord adapters:
